@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template
 from flask_bootstrap import Bootstrap
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 bootstrap = Bootstrap(app)
 
 @app.route('/')
