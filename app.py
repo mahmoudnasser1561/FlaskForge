@@ -6,6 +6,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 import os
 
 
@@ -18,7 +19,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] =\
 app.config['SECRET_KEY'] = 'hard to guess'
 
 db = SQLAlchemy(app)
-
+migrate = Migrate(app, db)
 bootstrap = Bootstrap(app)
 moment = Moment(app)
 
