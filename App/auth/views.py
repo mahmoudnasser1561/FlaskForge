@@ -4,7 +4,7 @@ from . import auth
 from ..models import User
 from .forms import LoginForm, RegistrationForm
 from . import auth
-from .. import db
+from . import db
 
 @auth.route('/login', methods=['GET', 'POSt'])
 def login():
@@ -27,7 +27,7 @@ def logout():
     flash('You have been logged out.')
     return redirect(url_for('main.index'))
 
-@auth.route('/register', methods=['GET', 'POST'])
+@auth.route('/register', methods=['GET', 'POSt'])
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
