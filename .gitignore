@@ -1,5 +1,5 @@
 __pycache__
-v*
+v
 .env
 data.sqlite
 data-dev.sqlite
