@@ -1,6 +1,4 @@
 __pycache__
 v
 .env
-data.sqlite
-data-dev.sqlite
-data.sqlite
+data*.sqlite
