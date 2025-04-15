@@ -1,6 +1,6 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import URLSafeTimedSerializer as Serializer
-from flask_login import UserMixin
+from flask_login import UserMixin, AnonymousUserMixin
 from flask import current_app
 from . import login_manager
 from . import db 
@@ -114,6 +114,22 @@ class User(db.Model, UserMixin):
 
     def __repr__(self):
         return '<User %r>' % self.username
+    
+    def can(self, perm):
+        return self.role is not None and self.role.has_permission(perm)
+    
+    def is_adminstrator(self):
+        return self.can(Permission.ADMIN)
+    
+
+class AnonymousUser(AnonymousUserMixin):
+    def can(self, permissions):
+        return False
+    
+    def is_adminstrator(self):
+        return False
+    
+login_manager.anonymous_user = AnonymousUser
 
 @login_manager.user_loader
 def load_user(user_id):
