@@ -44,6 +44,28 @@ class Role(db.Model):
             self.permissions += perm
 
 
+    @staticmethod
+    def insert_roles():
+        roles = {
+            'User': [Permission.FOLLOW, Permission.COMMENT, Permission.WRITE],
+            'Moderator': [Permission.FOLLOW, Permission.COMMENT,
+                          Permission.WRITE, Permission.MODERATE],
+            'Adminstrator': [Permission.FOLLOW, Permission.MODERATE, Permission.COMMENT,
+                             Permission.ADMIN, Permission.WRITE]
+        }
+        default_role = 'User'
+        for r in roles:
+            role = Role.query.filter_by(name=r).first()
+            if role is None:
+                role = Role(name=r)
+            role.reset_permissions()
+            for perm in roles[r]:
+                role.add_permission(perm)
+            role.default = (role.name == default_role)
+
+            db.session.add(role)
+        db.session.commit()
+
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
