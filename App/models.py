@@ -2,9 +2,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import URLSafeTimedSerializer as Serializer
 from flask_login import UserMixin, AnonymousUserMixin
 from datetime import datetime
-from flask import current_app
+from flask import current_app, request
 from . import login_manager
 from . import db 
+import hashlib
 
 
 class Permission:
@@ -82,6 +83,9 @@ class User(db.Model, UserMixin):
     member_since = db.Column(db.DateTime(), default=datetime.utcnow)
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
 
+    avatar_hash = db.Column(db.String(32))
+
+
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
         if self.role is None:
@@ -112,6 +116,17 @@ class User(db.Model, UserMixin):
         db.session.add(self)
         db.session.commit()
 
+    def gravatar_hash(self):
+        return hashlib.md5(self.email.lower().encode('utf-8')).hexdigest()
+
+    def gravatar(self, size=100, default='identicon', rating='g'):
+        url = 'https://secure.gravatar.com/avatar'
+        hash = self.avatar_hash or self.gravatar_hash()
+        return '{url}/{hash}?s={size}&d={default}&r={rating}'.format(
+            url=url, hash=hash, size=size, default=default, rating=rating)
+    
+    def __repr__(self):
+        return '<User %r>' % self.username
 
     @property
     def password(self):
