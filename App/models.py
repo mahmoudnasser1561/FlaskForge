@@ -144,6 +144,10 @@ class User(db.Model, UserMixin):
 
     def is_administrator(self):
         return self.can(Permission.ADMIN)
+    
+    def generate_email_change_token(self, new_email, expiration=3600):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        return s.dumps({'change_email': self.id, 'new_email': new_email})
 
     def __repr__(self):
         return '<User %r>' % self.username
