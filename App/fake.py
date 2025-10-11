@@ -1,21 +1,24 @@
-from random import randint
-from sqlalchemy.exc import IntegrityError
+from random import choice
 from faker import Faker
 from . import db
 from .models import User, Post
+from sqlalchemy.exc import IntegrityError
+fake = Faker()
 
-def users(count=100):
-    fake = Faker()
+def create_users(count=100):
     i = 0
     while i < count:
-        u = User(email=fake.email(),
+        username = fake.user_name()
+        u = User(
+            email=fake.email(),
+            username=username,
             password='password',
-            confirmed=True, 
+            confirmed=True,
             name=fake.name(),
             location=fake.city(),
             about_me=fake.text(),
-            member_since=fake.past_date())
-        
+            member_since=fake.date_time_this_decade()
+        )
         db.session.add(u)
         try:
             db.session.commit()
@@ -23,14 +26,16 @@ def users(count=100):
         except IntegrityError:
             db.session.rollback()
 
-def posts(count=100):
-    fake = Faker()
-    user_count = User.query.count()
-
-    for i in range(count):
-        u = User.query.offset(randint(0, user_count - 1)).first()
-        p = Post(body=fake.text(),
-                    timestamp=fake.past_date(),
-                    author=u)
-        db.session.add(p)
+def create_posts(count=100):
+    users_list = User.query.all()
+    if not users_list:
+        raise Exception("No users found! Create users first.")
+    for _ in range(count):
+        user = choice(users_list)
+        post = Post(
+            body=fake.text(),
+            timestamp=fake.date_time_this_year(),
+            author=user
+        )
+        db.session.add(post)
     db.session.commit()
