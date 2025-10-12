@@ -1,0 +1,18 @@
+  File "/home/mahmoud/Dev/Experiments/FlaskForge/App/templates/index.html", line 2, in top-level template code
+    {% import 'bootstrap/wtf.html' as wtf %}
+  File "/home/mahmoud/Dev/Experiments/FlaskForge/App/templates/base.html", line 1, in top-level template code
+    {% extends "bootstrap/base.html" %}
+  File "/home/mahmoud/Dev/Experiments/FlaskForge/v/lib/python3.10/site-packages/flask_bootstrap/templates/bootstrap/base.html", line 1, in top-level template code
+    {% block doc -%}
+  File "/home/mahmoud/Dev/Experiments/FlaskForge/v/lib/python3.10/site-packages/flask_bootstrap/templates/bootstrap/base.html", line 4, in block 'doc'
+    {%- block html %}
+  File "/home/mahmoud/Dev/Experiments/FlaskForge/v/lib/python3.10/site-packages/flask_bootstrap/templates/bootstrap/base.html", line 20, in block 'html'
+    {% block body -%}
+  File "/home/mahmoud/Dev/Experiments/FlaskForge/v/lib/python3.10/site-packages/flask_bootstrap/templates/bootstrap/base.html", line 23, in block 'body'
+    {% block content -%}
+  File "/home/mahmoud/Dev/Experiments/FlaskForge/App/templates/base.html", line 63, in block 'content'
+    <!-- {% block page_content %}{% endblock %} -->
+  File "/home/mahmoud/Dev/Experiments/FlaskForge/App/templates/index.html", line 22, in block 'page_content'
+    {% include '_posts.html' %}
+  File "/home/mahmoud/Dev/Experiments/FlaskForge/App/templates/_posts.html", line 5, in top-level template code
+    <a href="{{ url_for('.user', username=post.author.username) }}">
