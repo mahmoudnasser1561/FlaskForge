@@ -2,7 +2,7 @@
 {% import "bootstrap/wtf.html" as wtf %}
 {% import "_macros.html" as macros %}
 
-{% block title %}Flasky{% endblock %}
+{% block title %}FlaskyForge{% endblock %}
 
 {% block page_content %}
 <div class="page-header">
@@ -21,4 +21,9 @@
     {{ macros.pagination_widget(pagination, '.index') }}
 </div>
 {% endif %}
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{{ pagedown.include_pagedown() }}
 {% endblock %}
