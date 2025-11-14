@@ -114,6 +114,9 @@ class User(db.Model, UserMixin):
                 self.role = Role.query.filter_by(name='Adminstrator').first()
             if self.role is None:
                 self.role = Role.query.filter_by(default=True).first()
+        if self.email is not None and self.avatar_hash is None:
+            self.avatar_hash = self.gravatar_hash()
+
 
     def generate_confirmation_token(self, expiration=3600):
         s = Serializer(current_app.config['SECRET_KEY'])
