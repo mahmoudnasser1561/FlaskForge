@@ -105,6 +105,8 @@ class User(db.Model, UserMixin):
                                 backref=db.backref('followed', lazy='joined'),
                                 lazy='dynamic',
                                 cascade='all, delete-orphan')
+    comments = db.relationship('Comment', backref='author', lazy='dynamic')
+
     
     @staticmethod
     def add_self_follows():
@@ -234,6 +236,8 @@ class Post(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     author = db.relationship('User', backref='posts')
+    comments = db.relationship('Comment', backref='post', lazy='dynamic')
+
     
     @staticmethod
     def on_changed_body(target, value, oldvalue, initiator):
