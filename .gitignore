@@ -1,4 +1,9 @@
 __pycache__
 v
-.env
+.venv
 data*.sqlite
+.venv/
+__pycache__/
+*.pyc
+
+.env
