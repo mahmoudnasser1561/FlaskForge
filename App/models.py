@@ -131,17 +131,17 @@ class User(db.Model, UserMixin):
 
 
     def generate_confirmation_token(self, expiration=3600):
-        s = Serializer(current_app.config['SECRET_KEY'])
+        s = Serializer(current_app.config['SECRET_KEY'], salt='password-reset')
         return s.dumps({'confirm': self.id})
     
     def confirm(self, token, expiration=3600):
-        s = Serializer(current_app.config['SECRET_KEY'])
+        s = Serializer(current_app.config['SECRET_KEY'], salt='password-reset')
         try:
             data = s.loads(token, max_age=expiration)
         except:
             return False
 
-        if data.get('confirm') != self.id:
+        if data.get('confirm') != self.id:  
             return False
         self.confirmed = True
         db.session.add(self)
@@ -209,12 +209,12 @@ class User(db.Model, UserMixin):
         return self.can(Permission.ADMIN)
     
     def generate_reset_token(self, expiration=3600):
-        s = Serializer(current_app.config['SECRET_KEY'], expiration)
-        return s.dumps({'reset': self.id}).decode('utf-8')
+        s = Serializer(current_app.config['SECRET_KEY'], salt='reset-salt')
+        return s.dumps({'reset': self.id})
 
     @staticmethod
     def reset_password(token, new_password):
-        s = Serializer(current_app.config['SECRET_KEY'])
+        s = Serializer(current_app.config['SECRET_KEY'], salt='reset-salt')
         try:
             data = s.loads(token.encode('utf-8'))
         except:
@@ -227,11 +227,11 @@ class User(db.Model, UserMixin):
         return True
     
     def generate_email_change_token(self, new_email, expiration=3600):
-        s = Serializer(current_app.config['SECRET_KEY'])
+        s = Serializer(current_app.config['SECRET_KEY'], salt='reset-salt')
         return s.dumps({'change_email': self.id, 'new_email': new_email})
     
     def change_email(self, token):
-        s = Serializer(current_app.config['SECRET_KEY'])
+        s = Serializer(current_app.config['SECRET_KEY'], salt='reset-salt')
         try:
             data = s.loads(token.encode('utf-8'))
         except:
@@ -260,7 +260,7 @@ class User(db.Model, UserMixin):
             'posts_url': url_for('api.get_user_posts', id=self.id),
             'followed_posts_url': url_for('api.get_user_followed_posts',
                                           id=self.id),
-            'post_count': self.posts.count()
+            'post_count': len(self.posts)
         }
         return json_user
     
