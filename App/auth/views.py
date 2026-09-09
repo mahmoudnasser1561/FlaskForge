@@ -4,9 +4,10 @@ from .forms import LoginForm, RegistrationForm, ChangePasswordForm, ChangeEmailF
 from ..models import User
 from . import auth
 from ..email import send_email
-from . import db
+from . import db, limiter
 
 @auth.route('/login', methods=['GET', 'POSt'])
+@limiter.limit("10 per minute", methods=["POST"])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
@@ -28,6 +29,7 @@ def logout():
     return redirect(url_for('main.index'))
 
 @auth.route('/register', methods=['GET', 'POSt'])
+@limiter.limit("5 per hour", methods=["POST"])
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():

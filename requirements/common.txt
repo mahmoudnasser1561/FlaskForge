@@ -11,6 +11,7 @@ email_validator==2.2.0
 Flask==3.1.0
 Flask-Bootstrap==3.3.7.1
 Flask-HTTPAuth==4.8.1
+Flask-Limiter==4.1.1
 Flask-Login==0.6.3
 Flask-Mail==0.10.0
 Flask-Migrate==4.1.0
@@ -55,5 +56,6 @@ WTForms==3.2.1
 yagmail==0.15.293
 flask-pagedown==0.4.0
 bleach==6.2.0
-markdown==3.9 
+markdown==3.9
 webencodings==0.5.1
+redis==5.0.8

@@ -19,6 +19,7 @@ class Config:
     FLASKY_COMMENTS_PER_PAGE = 30
     SQLALCHEMY_RECORD_QUERIES = True
     FLASKY_SLOW_DB_QUERY_TIME = 0.5
+    RATELIMIT_STORAGE_URI = os.environ.get('REDIS_URL', 'memory://')
 
 
     @staticmethod
@@ -35,6 +36,7 @@ class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL') or \
     'sqlite:///' + os.path.join(basedir, 'data-test.sqlite')
     WTF_CSRF_ENABLED = False
+    RATELIMIT_ENABLED = False
     
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \

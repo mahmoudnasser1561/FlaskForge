@@ -76,3 +76,16 @@ Re-running `flask seed` is safe for users and follows (duplicates are
 skipped), but will add *more* posts and comments each time rather than
 replacing them.
 
+## Security
+
+Login (`/auth/login`) and registration (`/auth/register`) are rate
+limited per IP address (10 login attempts/minute, 5 registrations/hour;
+only `POST` submissions count, so browsing the pages freely never trips
+it) to slow down password-guessing and mass account creation. The limiter
+is backed by Redis (the `redis` service in `docker-compose.yml`) so the
+limit is enforced correctly across gunicorn's multiple worker processes —
+without a shared backend, each worker would track its own count and the
+real limit would silently be higher than configured. Set `REDIS_URL` to
+point elsewhere in production; running `flask run` locally without Redis
+falls back to in-memory storage automatically (fine for a single dev
+process).
