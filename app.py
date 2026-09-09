@@ -74,3 +74,16 @@ def deploy():
 
     upgrade()
     Role.insert_roles()
+
+@app.cli.command()
+@click.option('--users', default=50, help='Number of fake users to create.')
+@click.option('--posts', default=100, help='Number of fake posts to create.')
+@click.option('--comments', default=200, help='Number of fake comments to create.')
+def seed(users, posts, comments):
+    """Populate the database with fake users, posts, follows, and comments."""
+    from App import fake
+
+    fake.create_users(users)
+    fake.create_posts(posts)
+    fake.create_followers()
+    fake.create_comments(comments)

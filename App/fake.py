@@ -1,7 +1,7 @@
-from random import choice
+from random import choice, sample
 from faker import Faker
 from . import db
-from .models import User, Post
+from .models import User, Post, Comment
 from sqlalchemy.exc import IntegrityError
 fake = Faker()
 
@@ -38,4 +38,29 @@ def create_posts(count=100):
             author=user
         )
         db.session.add(post)
+    db.session.commit()
+
+def create_followers(max_per_user=8):
+    users_list = User.query.all()
+    if not users_list:
+        raise Exception("No users found! Create users first.")
+    for user in users_list:
+        others = [u for u in users_list if u.id != user.id]
+        for other in sample(others, min(max_per_user, len(others))):
+            user.follow(other)
+    db.session.commit()
+
+def create_comments(count=100):
+    users_list = User.query.all()
+    posts_list = Post.query.all()
+    if not users_list or not posts_list:
+        raise Exception("No users or posts found! Create them first.")
+    for _ in range(count):
+        comment = Comment(
+            body=fake.text(),
+            timestamp=fake.date_time_this_year(),
+            author=choice(users_list),
+            post=choice(posts_list)
+        )
+        db.session.add(comment)
     db.session.commit()

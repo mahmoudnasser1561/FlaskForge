@@ -59,3 +59,20 @@ This project demonstrates modern Flask practices — including authentication, u
 Data persists in a named volume across restarts; use
 `docker compose down -v` to also remove the database volume.
 
+### Seed demo data (optional)
+
+The app starts empty — no fake users, posts, or comments are created
+automatically. To populate it with demo content so the site looks live
+when you browse it, run this once after the stack is up:
+```
+docker compose exec web flask seed
+```
+This creates 50 fake users, 100 posts, follow relationships between
+users, and 200 comments. To customize the amounts:
+```
+docker compose exec web flask seed --users 20 --posts 50 --comments 80
+```
+Re-running `flask seed` is safe for users and follows (duplicates are
+skipped), but will add *more* posts and comments each time rather than
+replacing them.
+
