@@ -1,7 +1,8 @@
-from flask import render_template, session, abort, redirect, url_for, current_app, flash, request, make_response
+from flask import render_template, session, abort, redirect, url_for, current_app, flash, request, make_response, jsonify
 from datetime import datetime
 from flask_login import login_required, current_user
 from flask_sqlalchemy.record_queries import get_recorded_queries
+from sqlalchemy import text
 from .. import db
 from ..models import User, Role, Post, Permission, Comment
 from ..email import send_email
@@ -18,6 +19,14 @@ def after_request(response):
                 % (query.statement, query.parameters, query.duration,
                    query.location))  
     return response
+
+@main.route('/health')
+def health():
+    try:
+        db.session.execute(text('SELECT 1'))
+        return jsonify(status='ok'), 200
+    except Exception:
+        return jsonify(status='error'), 503
 
 @main.route('/', methods=['GET', 'POST'])
 def index():
