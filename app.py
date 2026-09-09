@@ -83,7 +83,7 @@ def seed(users, posts, comments):
     """Populate the database with fake users, posts, follows, and comments."""
     from App import fake
 
-    fake.create_users(users)
-    fake.create_posts(posts)
-    fake.create_followers()
-    fake.create_comments(comments)
+    fake_users = fake.create_users(users)
+    fake.create_posts(posts, authors=fake_users)
+    fake.create_followers(fake_users)
+    fake.create_comments(comments, authors=fake_users)
