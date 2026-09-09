@@ -59,6 +59,10 @@ This project demonstrates modern Flask practices — including authentication, u
 Data persists in a named volume across restarts; use
 `docker compose down -v` to also remove the database volume.
 
+A `GET /health` endpoint checks database connectivity and returns
+`{"status": "ok"}` (200) or `{"status": "error"}` (503); `docker compose
+ps` reflects this via the `web` service's health status.
+
 ### Seed demo data (optional)
 
 The app starts empty — no fake users, posts, or comments are created
