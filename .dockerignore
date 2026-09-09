@@ -5,3 +5,6 @@ __pycache__
 *.pyc
 *.sqlite
 tmp/
+.env
+.env.*
+!.env.example

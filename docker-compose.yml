@@ -2,13 +2,13 @@ services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: flaskforge
-      POSTGRES_PASSWORD: flaskforge
-      POSTGRES_DB: flaskforge
+      POSTGRES_USER: ${POSTGRES_USER:-flaskforge}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-flaskforge}
+      POSTGRES_DB: ${POSTGRES_DB:-flaskforge}
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U flaskforge"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-flaskforge}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -20,10 +20,18 @@ services:
     environment:
       FLASK_APP: app.py
       FLASK_CONFIG: production
-      # Local-only defaults. Override these for anything beyond local use.
-      SECRET_KEY: dev-secret-change-me
-      DATABASE_URL: postgresql://flaskforge:flaskforge@db:5432/flaskforge
-      FLASKY_ADMIN: admin@example.com
+      # All values below come from a local .env file (see .env.example).
+      # None of the real values live in this file, so it's safe to commit.
+      SECRET_KEY: ${SECRET_KEY:-dev-secret-change-me}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-flaskforge}:${POSTGRES_PASSWORD:-flaskforge}@db:5432/${POSTGRES_DB:-flaskforge}
+      FLASKY_ADMIN: ${FLASKY_ADMIN:-admin@example.com}
+      MAIL_SERVER: ${MAIL_SERVER:-smtp.googlemail.com}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USE_TLS: ${MAIL_USE_TLS:-true}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_DEFAULT_SENDER: ${MAIL_DEFAULT_SENDER:-}
+      FLASKY_MAIL_SENDER: ${FLASKY_MAIL_SENDER:-}
     depends_on:
       db:
         condition: service_healthy
