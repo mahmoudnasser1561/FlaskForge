@@ -8,6 +8,7 @@ from flask_login import LoginManager
 from flask_pagedown import PageDown
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_caching import Cache
 
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
@@ -18,6 +19,7 @@ moment = Moment()
 db = SQLAlchemy()
 page_down = PageDown()
 limiter = Limiter(key_func=get_remote_address)
+cache = Cache()
 
 def create_app(config_name):
     app = Flask(__name__)
@@ -30,6 +32,7 @@ def create_app(config_name):
     login_manager.init_app(app)
     page_down.init_app(app)
     limiter.init_app(app)
+    cache.init_app(app)
 
     from .main import main as main_blueprint
     from .auth import auth as auth_blueprint

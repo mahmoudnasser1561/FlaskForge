@@ -20,6 +20,9 @@ class Config:
     SQLALCHEMY_RECORD_QUERIES = True
     FLASKY_SLOW_DB_QUERY_TIME = 0.5
     RATELIMIT_STORAGE_URI = os.environ.get('REDIS_URL', 'memory://')
+    CACHE_TYPE = 'RedisCache' if os.environ.get('REDIS_URL') else 'SimpleCache'
+    CACHE_REDIS_URL = os.environ.get('REDIS_URL', '')
+    CACHE_DEFAULT_TIMEOUT = 60
 
 
     @staticmethod
@@ -37,6 +40,7 @@ class TestingConfig(Config):
     'sqlite:///' + os.path.join(basedir, 'data-test.sqlite')
     WTF_CSRF_ENABLED = False
     RATELIMIT_ENABLED = False
+    CACHE_TYPE = 'NullCache'
     
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \

@@ -93,3 +93,9 @@ real limit would silently be higher than configured. Set `REDIS_URL` to
 point elsewhere in production; running `flask run` locally without Redis
 falls back to in-memory storage automatically (fine for a single dev
 process).
+
+`GET /api/v1/posts/`, `GET /api/v1/posts/<id>`, and `GET /api/v1/users/<id>`
+are cached for 60 seconds (also Redis-backed, same fallback behavior as
+above) to reduce DB load on repeated reads — a change made within that
+window (e.g. a new post) can take up to 60s to show up in these three
+endpoints. Write endpoints are never cached.
