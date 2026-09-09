@@ -3,8 +3,8 @@ import threading
 import time
 import unittest
 from selenium import webdriver
-from app import create_app, db, fake
-from app.models import Role, User, Post
+from App import create_app, db, fake
+from App.models import Role, User, Post
 
 
 class SeleniumTestCase(unittest.TestCase):
@@ -35,8 +35,8 @@ class SeleniumTestCase(unittest.TestCase):
             # create the database and populate with some fake data
             db.create_all()
             Role.insert_roles()
-            fake.users(10)
-            fake.posts(10)
+            fake.create_users(10)
+            fake.create_posts(10)
 
             # add an administrator user
             admin_role = Role.query.filter_by(name='Administrator').first()

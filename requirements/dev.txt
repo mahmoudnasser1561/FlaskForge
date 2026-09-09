@@ -5,3 +5,4 @@ coverage==4.4.1
 faker==0.7.18
 httpie==0.9.9
 Pygments==2.2.0
+selenium==4.49.0
