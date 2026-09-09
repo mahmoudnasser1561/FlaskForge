@@ -43,13 +43,19 @@ This project demonstrates modern Flask practices — including authentication, u
 
 ## Run with Docker
 
-To run the app and a Postgres database with a single command:
-```
-docker compose up --build
-```
-Then open http://localhost:5000 in your browser. The `web` container runs
-`flask deploy` (migrations + role seeding) automatically before starting,
-so it's ready to use as soon as the containers are up — no manual setup
-steps needed. Data persists in a named volume across restarts; use
+1. Copy `.env.example` to `.env` and fill in your own values (at minimum
+   `SECRET_KEY`; fill in the `MAIL_*` fields too if you want confirmation
+   emails to actually send — see the comments in `.env.example` for how to
+   get a Gmail App Password). `.env` is git-ignored, so your real values
+   never get committed.
+2. Run:
+   ```
+   docker compose up --build
+   ```
+   Then open http://localhost:5000 in your browser. The `web` container
+   runs `flask deploy` (migrations + role seeding) automatically before
+   starting, so it's ready to use as soon as the containers are up.
+
+Data persists in a named volume across restarts; use
 `docker compose down -v` to also remove the database volume.
 
