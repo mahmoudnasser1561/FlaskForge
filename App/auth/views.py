@@ -39,7 +39,7 @@ def register():
         db.session.add(user)
         db.session.commit()
         token = user.generate_confirmation_token()
-        send_email(user.email, 'Confirm You Account',
+        send_email(user.email, 'Confirm Your Account',
                    'auth/email/confirm', user=user, token=token)
         flash('A confirmation email has been sent to you by email.')
         return redirect(url_for('main.index'))
@@ -52,7 +52,7 @@ def confirm(token):
         return redirect(url_for('main.index'))
     if current_user.confirm(token):
         db.session.commit()
-        flash("You have confirmed you account. Thanks!")
+        flash("You have confirmed your account. Thanks!")
     else:
         flash('The confirmation link is invalid or expired.')
     return redirect(url_for('main.index'))
@@ -77,7 +77,7 @@ def unconfirmed():
 @login_required
 def resend_confirmation():
     token = current_user.generate_confirmation_token()
-    send_email(current_user.email, 'Confirm You Account',
+    send_email(current_user.email, 'Confirm Your Account',
                 'auth/email/confirm', user=current_user, token=token)
     flash('A new confirmation email has been sent to you by email.')
     return redirect(url_for('main.index'))

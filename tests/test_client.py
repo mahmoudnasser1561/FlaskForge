@@ -1,3 +1,4 @@
+import re
 import unittest
 from App import create_app, db
 from App.models import User, Role

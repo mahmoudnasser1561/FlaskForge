@@ -2,7 +2,7 @@ Dear {{ user.username }},
 
 Welcome to FlaskForge!
 
-to confirm you account please click on the following link:
+to confirm your account please click on the following link:
 
 {{ url_for('auth.confirm', token=token, _external=True) }}
 
