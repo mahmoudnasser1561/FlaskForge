@@ -3,7 +3,7 @@ import json
 import re
 from base64 import b64encode
 from app import create_app, db
-from app.models import User, Role, Post, Comment
+from App.models import User, Role, Post, Comment
 
 
 class APITestCase(unittest.TestCase):

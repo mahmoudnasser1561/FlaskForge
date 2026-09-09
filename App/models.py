@@ -248,6 +248,19 @@ class User(db.Model, UserMixin):
         db.session.add(self)
         return True
 
+    def generate_auth_token(self, expiration=3600):
+        s = Serializer(current_app.config['SECRET_KEY'], salt='auth-token')
+        return s.dumps({'id': self.id})
+
+    @staticmethod
+    def verify_auth_token(token):
+        s = Serializer(current_app.config['SECRET_KEY'], salt='auth-token')
+        try:
+            data = s.loads(token, max_age=3600)
+        except:
+            return None
+        return User.query.get(data.get('id'))
+
     def __repr__(self):
         return '<User %r>' % self.username
     
@@ -260,7 +273,7 @@ class User(db.Model, UserMixin):
             'posts_url': url_for('api.get_user_posts', id=self.id),
             'followed_posts_url': url_for('api.get_user_followed_posts',
                                           id=self.id),
-            'post_count': len(self.posts)
+            'post_count': self.posts.count()
         }
         return json_user
     
@@ -285,7 +298,7 @@ class Post(db.Model):
     body_html = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    author = db.relationship('User', backref='posts')
+    author = db.relationship('User', backref=db.backref('posts', lazy='dynamic'))
     comments = db.relationship('Comment', backref='post', lazy='dynamic')
 
     
@@ -336,5 +349,23 @@ class Comment(db.Model):
         target.body_html = bleach.linkify(bleach.clean(
             markdown(value, output_format='html'),
             tags=allowed_tags, strip=True))
+
+    def to_json(self):
+        json_comment = {
+            'url': url_for('api.get_comment', id=self.id),
+            'post_url': url_for('api.get_post', id=self.post_id),
+            'body': self.body,
+            'body_html': self.body_html,
+            'timestamp': self.timestamp,
+            'author_url': url_for('api.get_user', id=self.author_id),
+        }
+        return json_comment
+
+    @staticmethod
+    def from_json(json_comment):
+        body = json_comment.get('body')
+        if body is None or body == '':
+            raise ValidationError('comment does not have a body')
+        return Comment(body=body)
 
 db.event.listen(Comment.body, 'set', Comment.on_changed_body)
