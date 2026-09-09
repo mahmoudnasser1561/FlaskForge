@@ -16,4 +16,28 @@ This project demonstrates modern Flask practices — including authentication, u
 
 <img width="201" height="370" alt="Untitled Diagram-Page-3 drawio(6)" src="https://github.com/user-attachments/assets/0e592505-1797-4679-9096-460115c81315" />
 
+## Getting Started
+
+1. Create a virtual environment and install dependencies:
+   ```
+   python -m venv venv
+   source venv/bin/activate
+   pip install -r requirements/dev.txt
+   ```
+2. Set the required environment variables (e.g. in a `.env` file):
+   ```
+   FLASK_APP=app.py
+   SECRET_KEY=<your-secret-key>
+   FLASKY_ADMIN=<your-admin-email>
+   ```
+3. Run the deployment task to create the database schema and seed the
+   default user roles — this step is required before the app can be used,
+   otherwise newly registered users won't have a role or any permissions:
+   ```
+   flask deploy
+   ```
+4. Start the app:
+   ```
+   flask run
+   ```
 

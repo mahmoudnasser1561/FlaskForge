@@ -64,5 +64,13 @@ def profile(length, profile_dir):
     )
     
     os.environ.pop("FLASK_RUN_FROM_CLI", None)
-    
+
     app.run(debug=False)
+
+@app.cli.command()
+def deploy():
+    """Run deployment tasks."""
+    from flask_migrate import upgrade
+
+    upgrade()
+    Role.insert_roles()
