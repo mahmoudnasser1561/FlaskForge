@@ -1,0 +1,32 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: flaskforge
+      POSTGRES_PASSWORD: flaskforge
+      POSTGRES_DB: flaskforge
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U flaskforge"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_APP: app.py
+      FLASK_CONFIG: production
+      # Local-only defaults. Override these for anything beyond local use.
+      SECRET_KEY: dev-secret-change-me
+      DATABASE_URL: postgresql://flaskforge:flaskforge@db:5432/flaskforge
+      FLASKY_ADMIN: admin@example.com
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  db_data:

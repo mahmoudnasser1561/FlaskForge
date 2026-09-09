@@ -41,3 +41,15 @@ This project demonstrates modern Flask practices — including authentication, u
    flask run
    ```
 
+## Run with Docker
+
+To run the app and a Postgres database with a single command:
+```
+docker compose up --build
+```
+Then open http://localhost:5000 in your browser. The `web` container runs
+`flask deploy` (migrations + role seeding) automatically before starting,
+so it's ready to use as soon as the containers are up — no manual setup
+steps needed. Data persists in a named volume across restarts; use
+`docker compose down -v` to also remove the database volume.
+
