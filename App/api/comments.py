@@ -1,6 +1,6 @@
 from flask import jsonify, request, g, url_for, current_app
 from .. import db
-from ..models import Post, Permission, Comment
+from ..models import Post, Permission, Comment, Notification
 from . import api
 from .decorators import permission_required
 
@@ -62,6 +62,8 @@ def new_post_comment(id):
     comment.author = g.current_user
     comment.post = post
     db.session.add(comment)
+    db.session.flush()
+    Notification.create_for_comment(comment)
     db.session.commit()
     return jsonify(comment.to_json()), 201, \
         {'Location': url_for('api.get_comment', id=comment.id, _external=True)}

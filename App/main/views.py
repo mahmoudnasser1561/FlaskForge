@@ -4,7 +4,7 @@ from flask_login import login_required, current_user
 from flask_sqlalchemy.record_queries import get_recorded_queries
 from sqlalchemy import text
 from .. import db
-from ..models import User, Role, Post, Permission, Comment
+from ..models import User, Role, Post, Permission, Comment, Notification
 from ..email import send_email
 from . import main
 from .forms import NameForm, EDitProfileForm, EditProfileAdminForm, PostForm, CommentForm
@@ -112,6 +112,8 @@ def post(id):
                           post=post,
                           author=current_user._get_current_object())
         db.session.add(comment)
+        db.session.flush()
+        Notification.create_for_comment(comment)
         db.session.commit()
         flash('Your comment has been published.')
         return redirect(url_for('.post', id=post.id, page=-1))
