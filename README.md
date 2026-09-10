@@ -1,4 +1,7 @@
 # FlaskForge Microblog
+
+![CI](https://github.com/mahmoudnasser1561/FlaskForge/actions/workflows/ci.yml/badge.svg)
+
 FlaskForge Microblog is a full-stack MicroBlog application built with Flask, offering a complete set of features for user interaction and content sharing. 
 This project demonstrates modern Flask practices — including authentication, user roles, admin control, databases, pagination.
 
