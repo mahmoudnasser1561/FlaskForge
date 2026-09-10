@@ -1,6 +1,6 @@
 Dear {{ user.username }},
 
-Welcome to FlaskForge!
+Welcome to StaffRoom!
 
 to confirm your account please click on the following link:
 
@@ -8,6 +8,6 @@ to confirm your account please click on the following link:
 
 Sincerely,
 
-FlaskForge Team
+StaffRoom Team
 
 Note: replies to this email are not monitored.

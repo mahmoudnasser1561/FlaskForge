@@ -1,14 +1,16 @@
-# FlaskForge Microblog
+# StaffRoom
 
 ![CI](https://github.com/mahmoudnasser1561/FlaskForge/actions/workflows/ci.yml/badge.svg)
 
-FlaskForge Microblog is a full-stack MicroBlog application built with Flask, offering a complete set of features for user interaction and content sharing. 
+StaffRoom is a full-stack internal forum for teams, built with Flask — a
+private space for coworkers to post updates, comment, and keep up with
+what teammates are working on.
 This project demonstrates modern Flask practices — including authentication, user roles, admin control, databases, pagination.
 
 ## Features
 1. User registration & authentication (login/logout)
 2. User profiles and avatar images via Gravatar
-4. Create, edit, and delete blog posts
+4. Create, edit, and delete posts
 5. Pagination for posts
 6. Admin control
 7. Email notifications & password reset
