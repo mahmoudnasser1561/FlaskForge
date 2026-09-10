@@ -16,17 +16,10 @@ services:
   redis:
     image: redis:7-alpine
 
-  frontend:
-    build: ./frontend
-    volumes:
-      - frontend_dist:/output
-
   web:
     build: .
     ports:
       - "5000:5000"
-    volumes:
-      - frontend_dist:/app/App/static/dist:ro
     environment:
       FLASK_APP: app.py
       FLASK_CONFIG: production
@@ -52,8 +45,6 @@ services:
       retries: 5
       start_period: 10s
     depends_on:
-      frontend:
-        condition: service_completed_successfully
       db:
         condition: service_healthy
       redis:
@@ -61,4 +52,3 @@ services:
 
 volumes:
   db_data:
-  frontend_dist:

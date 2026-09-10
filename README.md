@@ -85,26 +85,6 @@ Re-running `flask seed` is safe for users and follows (duplicates are
 skipped), but will add *more* posts and comments each time rather than
 replacing them.
 
-## Frontend development
-
-A small React/TypeScript layer lives in `frontend/` and progressively
-enhances specific pieces of the server-rendered pages (Jinja still
-renders everything — this isn't a SPA). It's fully decoupled from the
-Python app: its own `frontend/Dockerfile`, no shared build step, and no
-knowledge of `App/`'s structure. `docker compose up --build` handles it
-automatically — the `frontend` service builds once and writes the
-compiled bundle into a shared volume that `web` mounts read-only at
-`App/static/dist/`.
-
-For bare `flask run` (no Docker), build it once manually first:
-```
-cd frontend
-npm install
-npm run build
-```
-The rest of the app works fine without this step — the enhancements are
-optional, not required for the page to function.
-
 ## Security
 
 Login (`/auth/login`) and registration (`/auth/register`) are rate

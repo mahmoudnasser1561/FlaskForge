@@ -122,15 +122,3 @@ div.flask-pagedown-preview h3 {
 .notification-menu li a {
     white-space: normal;
 }
-.notification-badge-pulse {
-    box-shadow: 0 0 0 0 rgba(217, 83, 79, 0.7);
-    animation: notification-pulse 1s ease-out;
-}
-@keyframes notification-pulse {
-    0% {
-        box-shadow: 0 0 0 0 rgba(217, 83, 79, 0.7);
-    }
-    100% {
-        box-shadow: 0 0 0 8px rgba(217, 83, 79, 0);
-    }
-}
