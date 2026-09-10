@@ -35,7 +35,7 @@ def test(coverage, test_names):
         tests = unittest.TestLoader().loadTestsFromNames(test_names)
     else:
         tests = unittest.TestLoader().discover('tests')
-    unittest.TextTestRunner(verbosity=2).run(tests)
+    result = unittest.TextTestRunner(verbosity=2).run(tests)
     if COV:
         COV.stop()
         COV.save()
@@ -46,6 +46,7 @@ def test(coverage, test_names):
         COV.html_report(directory=covdir)
         print('HTML version: file://%s/index.html' % covdir)
         COV.erase()
+    sys.exit(0 if result.wasSuccessful() else 1)
         
 @app.cli.command()
 @click.option('--length', default=25,
