@@ -372,3 +372,33 @@ class Comment(db.Model):
         return Comment(body=body)
 
 db.event.listen(Comment.body, 'set', Comment.on_changed_body)
+
+
+class Notification(db.Model):
+    __tablename__ = 'notifications'
+    id = db.Column(db.Integer, primary_key=True)
+    recipient_id = db.Column(db.Integer, db.ForeignKey('users.id'), index=True)
+    actor_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    verb = db.Column(db.String(32))
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), nullable=True)
+    comment_id = db.Column(db.Integer, db.ForeignKey('comments.id'), nullable=True)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    read = db.Column(db.Boolean, default=False)
+
+    recipient = db.relationship('User', foreign_keys=[recipient_id],
+                                backref=db.backref('notifications', lazy='dynamic'))
+    actor = db.relationship('User', foreign_keys=[actor_id])
+    post = db.relationship('Post')
+    comment = db.relationship('Comment')
+
+    @staticmethod
+    def create_for_comment(comment):
+        if comment.author_id == comment.post.author_id:
+            return None
+        n = Notification(recipient_id=comment.post.author_id,
+                         actor_id=comment.author_id,
+                         verb='commented',
+                         post_id=comment.post_id,
+                         comment_id=comment.id)
+        db.session.add(n)
+        return n
