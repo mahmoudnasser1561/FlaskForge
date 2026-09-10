@@ -1,4 +1,5 @@
 {% extends "bootstrap/base.html" %}
+{% import "_macros.html" as macros with context %}
 
 {% block title %}FlaskForge{% endblock %}
 
@@ -35,11 +36,20 @@
                 <li><a href="{{ url_for('main.moderate') }}">Moderate Comments</a></li>
                 {% endif %}
                 {% if current_user.is_authenticated %}
-                <li>
-                    <a href="{{ url_for('main.notifications') }}">
-                        Notifications
-                        {% if unread_notification_count %}<span class="badge">{{ unread_notification_count }}</span>{% endif %}
+                <li class="dropdown notification-dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <span class="glyphicon glyphicon-bell"></span>
+                        {% if unread_notification_count %}<span class="badge notification-badge">{{ unread_notification_count }}</span>{% endif %}
                     </a>
+                    <ul class="dropdown-menu notification-menu">
+                        {% for n in recent_notifications %}
+                        <li>{{ macros.render_notification(n) }}</li>
+                        {% else %}
+                        <li class="text-muted" style="padding: 8px 16px;">No notifications yet.</li>
+                        {% endfor %}
+                        <li role="separator" class="divider"></li>
+                        <li><a href="{{ url_for('main.notifications') }}">See all notifications</a></li>
+                    </ul>
                 </li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">

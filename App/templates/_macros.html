@@ -1,3 +1,19 @@
+{% macro render_notification(notification) %}
+<a href="{{ url_for('main.user', username=notification.actor.username) }}">
+    <img class="img-rounded" src="{{ notification.actor.gravatar(size=24) }}">
+</a>
+<a href="{{ url_for('main.user', username=notification.actor.username) }}">{{ notification.actor.username }}</a>
+{% if notification.verb == 'commented' %}
+commented on your post:
+<a href="{{ url_for('main.post', id=notification.post_id, page=-1) }}">
+    {{ notification.post.body[:40] }}{% if notification.post.body|length > 40 %}...{% endif %}
+</a>
+{% else %}
+{{ notification.verb }}
+{% endif %}
+<div><small class="text-muted">{{ moment(notification.timestamp).fromNow() }}</small></div>
+{% endmacro %}
+
 {% macro pagination_widget(pagination, endpoint) %}
 <ul class="pagination">
     <li{% if not pagination.has_prev %} class="disabled"{% endif %}>
