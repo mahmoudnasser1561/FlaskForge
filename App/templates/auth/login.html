@@ -11,6 +11,11 @@
     {{ wtf.quick_form(form) }}
     <br>
     <p>
+        <a href="{{ url_for('auth.google_login') }}" class="btn btn-default">
+            Sign in with Google
+        </a>
+    </p>
+    <p>
         New user?
         <a href="{{ url_for('auth.register') }}">
             Click here to register

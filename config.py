@@ -23,6 +23,8 @@ class Config:
     CACHE_TYPE = 'RedisCache' if os.environ.get('REDIS_URL') else 'SimpleCache'
     CACHE_REDIS_URL = os.environ.get('REDIS_URL', '')
     CACHE_DEFAULT_TIMEOUT = 60
+    GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
+    GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
 
 
     @staticmethod

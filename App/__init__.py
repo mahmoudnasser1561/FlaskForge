@@ -9,6 +9,7 @@ from flask_pagedown import PageDown
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_caching import Cache
+from authlib.integrations.flask_client import OAuth
 
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
@@ -20,6 +21,7 @@ db = SQLAlchemy()
 page_down = PageDown()
 limiter = Limiter(key_func=get_remote_address)
 cache = Cache()
+oauth = OAuth()
 
 def create_app(config_name):
     app = Flask(__name__)
@@ -33,6 +35,12 @@ def create_app(config_name):
     page_down.init_app(app)
     limiter.init_app(app)
     cache.init_app(app)
+    oauth.init_app(app)
+    oauth.register(
+        name='google',
+        server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+        client_kwargs={'scope': 'openid email profile'},
+    )
 
     from .main import main as main_blueprint
     from .auth import auth as auth_blueprint

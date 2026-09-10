@@ -1,10 +1,23 @@
+import re
 from flask import render_template, redirect, request, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from .forms import LoginForm, RegistrationForm, ChangePasswordForm, ChangeEmailForm
 from ..models import User
 from . import auth
 from ..email import send_email
-from . import db, limiter
+from . import db, limiter, oauth
+
+
+def _generate_username(email):
+    base = re.sub(r'[^A-Za-z0-9_.]', '', email.split('@')[0]) or 'user'
+    if not base[0].isalpha():
+        base = 'user' + base
+    username = base
+    suffix = 1
+    while User.query.filter_by(username=username).first() is not None:
+        suffix += 1
+        username = '{}{}'.format(base, suffix)
+    return username
 
 @auth.route('/login', methods=['GET', 'POSt'])
 @limiter.limit("10 per minute", methods=["POST"])
@@ -26,6 +39,41 @@ def login():
 def logout():
     logout_user()
     flash('You have been logged out.')
+    return redirect(url_for('main.index'))
+
+@auth.route('/google/login')
+@limiter.limit("10 per minute")
+def google_login():
+    redirect_uri = url_for('auth.google_callback', _external=True)
+    return oauth.google.authorize_redirect(redirect_uri)
+
+@auth.route('/google/callback')
+@limiter.limit("10 per minute")
+def google_callback():
+    token = oauth.google.authorize_access_token()
+    userinfo = token.get('userinfo') or oauth.google.userinfo()
+    google_id = userinfo['sub']
+    email = userinfo['email']
+    email_verified = bool(userinfo.get('email_verified', True))
+
+    user = User.query.filter_by(google_id=google_id).first()
+    if user is None:
+        user = User.query.filter_by(email=email).first()
+        if user is None:
+            user = User(email=email,
+                        username=_generate_username(email),
+                        google_id=google_id,
+                        name=userinfo.get('name'),
+                        confirmed=email_verified)
+            db.session.add(user)
+        else:
+            user.google_id = google_id
+            if email_verified:
+                user.confirmed = True
+        db.session.commit()
+
+    login_user(user)
+    flash('Logged in with Google.')
     return redirect(url_for('main.index'))
 
 @auth.route('/register', methods=['GET', 'POSt'])

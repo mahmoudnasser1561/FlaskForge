@@ -99,3 +99,15 @@ are cached for 60 seconds (also Redis-backed, same fallback behavior as
 above) to reduce DB load on repeated reads — a change made within that
 window (e.g. a new post) can take up to 60s to show up in these three
 endpoints. Write endpoints are never cached.
+
+## Sign in with Google
+
+In addition to the normal email/password login, users can sign in or
+sign up with a Google account. This requires `GOOGLE_CLIENT_ID` and
+`GOOGLE_CLIENT_SECRET` in `.env` — see the comments in `.env.example`
+for how to create them in Google Cloud Console. The redirect URI
+registered there must exactly match `/auth/google/callback` on whatever
+host you're running on (`http://localhost:5000/auth/google/callback`
+for local Docker use). If a Google sign-in's email matches an existing
+password-based account, the Google identity is linked to it (the
+password keeps working); otherwise a new account is created.

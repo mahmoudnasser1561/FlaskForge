@@ -87,6 +87,7 @@ class User(db.Model, UserMixin):
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     password_hash = db.Column(db.String(255))
     confirmed = db.Column(db.Boolean, default=False)
+    google_id = db.Column(db.String(64), unique=True, index=True, nullable=True)
 
     name = db.Column(db.String(64))
     location = db.Column(db.String(64))
@@ -200,6 +201,8 @@ class User(db.Model, UserMixin):
         self.password_hash = generate_password_hash(password)
 
     def verify_password(self, password):
+        if self.password_hash is None:
+            return False
         return check_password_hash(self.password_hash, password)
 
     def can(self, perm):

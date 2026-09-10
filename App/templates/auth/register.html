@@ -9,5 +9,11 @@
 </div>
 <div class="col-md-4">
     {{ wtf.quick_form(form) }}
+    <br>
+    <p>
+        <a href="{{ url_for('auth.google_login') }}" class="btn btn-default">
+            Sign up with Google
+        </a>
+    </p>
 </div>
 {% endblock %}
