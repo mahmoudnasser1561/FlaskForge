@@ -28,3 +28,4 @@ function mountNotificationBadge() {
 document.addEventListener('DOMContentLoaded', () => {
   mountNotificationBadge();
 });
+const deliberateTypeError: number = "not a number";
