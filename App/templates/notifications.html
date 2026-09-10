@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+
+{% block title %}Flasky - Notifications{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>Notifications</h1>
+</div>
+<table class="table table-hover notifications">
+    <thead><tr><th>Notification</th><th>When</th></tr></thead>
+    {% for notification in notifications %}
+    <tr{% if not notification.read %} class="active"{% endif %}>
+        <td>
+            <a href="{{ url_for('.user', username=notification.actor.username) }}">
+                <img class="img-rounded" src="{{ notification.actor.gravatar(size=24) }}">
+                {{ notification.actor.username }}
+            </a>
+            {% if notification.verb == 'commented' %}
+            commented on your post:
+            <a href="{{ url_for('.post', id=notification.post_id, page=-1) }}">
+                {{ notification.post.body[:50] }}{% if notification.post.body|length > 50 %}...{% endif %}
+            </a>
+            {% else %}
+            {{ notification.verb }}
+            {% endif %}
+        </td>
+        <td>{{ moment(notification.timestamp).fromNow() }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="2">No notifications yet.</td></tr>
+    {% endfor %}
+</table>
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, endpoint) }}
+</div>
+{% endblock %}

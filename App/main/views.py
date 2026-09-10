@@ -194,6 +194,23 @@ def followers(username):
                            endpoint='.followers', pagination=pagination,
                            follows=follows)
 
+@main.route('/notifications')
+@login_required
+def notifications():
+    page = request.args.get('page', 1, type=int)
+    pagination = current_user.notifications.order_by(
+        Notification.timestamp.desc()).paginate(
+        page=page, per_page=current_app.config['FLASKY_NOTIFICATIONS_PER_PAGE'],
+        error_out=False)
+    items = pagination.items
+    unread_ids = [n.id for n in items if not n.read]
+    if unread_ids:
+        Notification.query.filter(Notification.id.in_(unread_ids)).update(
+            {'read': True}, synchronize_session=False)
+        db.session.commit()
+    return render_template('notifications.html', notifications=items,
+                           pagination=pagination, endpoint='.notifications')
+
 @main.route('/followed_by/<username>')
 def followed_by(username):
     user = User.query.filter_by(username=username).first()
