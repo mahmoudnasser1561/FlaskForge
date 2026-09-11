@@ -277,6 +277,9 @@ div.flask-pagedown-preview {
     border-radius: var(--radius);
     padding: var(--space-2);
 }
+div.flask-pagedown-preview:empty {
+    display: none;
+}
 div.flask-pagedown-preview h1 {
     font-size: 140%;
 }
