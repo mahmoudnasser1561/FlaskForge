@@ -196,7 +196,7 @@ a:hover, a:focus {
 /* ==========================================================================
    Profile page
    ========================================================================== */
-.profile-thumbnail {
+.page-header > .profile-thumbnail {
     position: absolute;
 }
 .profile-header {
