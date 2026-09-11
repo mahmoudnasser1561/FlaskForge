@@ -1,3 +1,201 @@
+/* ==========================================================================
+   Design tokens
+   ========================================================================== */
+:root {
+    --color-primary: #4F46E5;
+    --color-primary-dark: #4338CA;
+    --color-primary-light: #EEF2FF;
+    --color-success: #059669;
+    --color-danger: #DC2626;
+    --color-warning: #D97706;
+
+    --color-text: #1F2937;
+    --color-text-muted: #6B7280;
+    --color-border: #E5E7EB;
+    --color-surface: #FFFFFF;
+    --color-background: #F9FAFB;
+
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 16px;
+    --space-4: 24px;
+    --space-5: 32px;
+    --space-6: 48px;
+
+    --radius: 8px;
+    --radius-lg: 12px;
+
+    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.1), 0 2px 4px -2px rgba(15, 23, 42, 0.08);
+
+    --transition: all 0.15s ease-in-out;
+}
+
+/* ==========================================================================
+   Base / typography
+   ========================================================================== */
+body {
+    background-color: var(--color-background);
+    color: var(--color-text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    color: var(--color-text);
+}
+a {
+    color: var(--color-primary);
+}
+a:hover, a:focus {
+    color: var(--color-primary-dark);
+}
+.page-header {
+    border-bottom-color: var(--color-border);
+}
+
+/* ==========================================================================
+   Navbar
+   ========================================================================== */
+.navbar-inverse {
+    background-color: var(--color-surface);
+    border-color: var(--color-border);
+    box-shadow: var(--shadow-sm);
+}
+.navbar-inverse .navbar-brand {
+    color: var(--color-primary);
+    font-weight: 700;
+}
+.navbar-inverse .navbar-brand:hover,
+.navbar-inverse .navbar-brand:focus {
+    color: var(--color-primary-dark);
+}
+.navbar-inverse .navbar-nav > li > a {
+    color: var(--color-text);
+    transition: var(--transition);
+}
+.navbar-inverse .navbar-nav > li > a:hover,
+.navbar-inverse .navbar-nav > li > a:focus {
+    color: var(--color-primary);
+    background-color: var(--color-primary-light);
+}
+.navbar-inverse .navbar-nav > .active > a,
+.navbar-inverse .navbar-nav > .active > a:hover,
+.navbar-inverse .navbar-nav > .active > a:focus {
+    color: var(--color-primary);
+    background-color: var(--color-primary-light);
+}
+.navbar-inverse .navbar-toggle {
+    border-color: var(--color-border);
+}
+.navbar-inverse .navbar-toggle .icon-bar {
+    background-color: var(--color-text);
+}
+.navbar-inverse .dropdown-menu {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+}
+.navbar-inverse .dropdown-menu > li > a {
+    color: var(--color-text);
+}
+.navbar-inverse .dropdown-menu > li > a:hover,
+.navbar-inverse .dropdown-menu > li > a:focus {
+    color: var(--color-primary);
+    background-color: var(--color-primary-light);
+}
+
+/* ==========================================================================
+   Buttons, forms, alerts, badges, panels, pagination
+   ========================================================================== */
+.btn {
+    border-radius: var(--radius);
+    transition: var(--transition);
+    box-shadow: var(--shadow-sm);
+}
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+.btn-primary {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
+}
+.btn-danger {
+    background-color: var(--color-danger);
+    border-color: var(--color-danger);
+}
+
+.form-control {
+    border-radius: var(--radius);
+    border-color: var(--color-border);
+    transition: var(--transition);
+    box-shadow: none;
+}
+.form-control:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.alert {
+    border-radius: var(--radius);
+    border: none;
+    box-shadow: var(--shadow-sm);
+}
+.alert-warning {
+    background-color: #FFFBEB;
+    color: #92400E;
+}
+
+.badge {
+    background-color: var(--color-primary);
+}
+.label-primary {
+    background-color: var(--color-primary);
+}
+.label-danger {
+    background-color: var(--color-danger);
+}
+
+.panel,
+.list-group-item {
+    border-radius: var(--radius-lg);
+    border-color: var(--color-border);
+}
+.list-group-item {
+    transition: var(--transition);
+}
+.list-group-item:hover {
+    box-shadow: var(--shadow-sm);
+}
+.list-group-item-info {
+    background-color: var(--color-primary-light);
+}
+
+.pagination > li > a,
+.pagination > li > span {
+    color: var(--color-primary);
+    border-color: var(--color-border);
+    transition: var(--transition);
+}
+.pagination > .active > a,
+.pagination > .active > span {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+.pagination > li > a:hover,
+.pagination > li > a:focus {
+    background-color: var(--color-primary-light);
+    color: var(--color-primary-dark);
+}
+
+/* ==========================================================================
+   Profile page
+   ========================================================================== */
 .profile-thumbnail {
     position: absolute;
 }
@@ -5,84 +203,79 @@
     min-height: 260px;
     margin-left: 280px;
 }
+@media (max-width: 767px) {
+    .profile-header {
+        margin-left: 0;
+        margin-top: 280px;
+    }
+}
+
+/* ==========================================================================
+   Feed cards (posts + comments share the same card language)
+   ========================================================================== */
 div.post-tabs {
-    margin-top: 16px;
+    margin-top: var(--space-3);
 }
-ul.posts {
-    list-style-type: none;
-    padding: 0px;
-    margin: 16px 0px 0px 0px;
-    border-top: 1px solid #e0e0e0;
-}
-div.post-tabs ul.posts {
-    margin: 0px;
-    border-top: none;
-}
-ul.posts li.post {
-    padding: 8px;
-    border-bottom: 1px solid #e0e0e0;
-}
-ul.posts li.post:hover {
-    background-color: #f0f0f0;
-}
-div.post-date {
-    float: right;
-}
-div.post-author {
-    font-weight: bold;
-}
-div.post-thumbnail {
-    position: absolute;
-}
-div.post-content {
-    margin-left: 48px;
-    min-height: 48px;
-}
-div.post-footer {
-    text-align: right;
-}
+ul.posts,
 ul.comments {
     list-style-type: none;
-    padding: 0px;
-    margin: 16px 0px 0px 0px;
+    padding: 0;
+    margin: var(--space-3) 0 0 0;
 }
-ul.comments li.comment {
-    margin-left: 32px;
-    padding: 8px;
-    border-bottom: 1px solid #e0e0e0;
+div.post-tabs ul.posts {
+    margin: 0;
 }
-ul.comments li.comment:nth-child(1) {
-    border-top: 1px solid #e0e0e0;
+li.post,
+li.comment {
+    display: flex;
+    gap: var(--space-3);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-3);
+    margin-bottom: var(--space-3);
+    transition: var(--transition);
 }
-ul.comments li.comment:hover {
-    background-color: #f0f0f0;
+li.post:hover,
+li.comment:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
 }
+li.comment {
+    margin-left: 0;
+}
+div.post-thumbnail,
+div.comment-thumbnail {
+    flex: 0 0 auto;
+}
+div.post-content,
+div.comment-content {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin-left: 0;
+}
+div.post-date,
 div.comment-date {
     float: right;
+    color: var(--color-text-muted);
+    font-size: 90%;
 }
+div.post-author,
 div.comment-author {
-    font-weight: bold;
+    font-weight: 600;
 }
-div.comment-thumbnail {
-    position: absolute;
-}
-div.comment-content {
-    margin-left: 48px;
-    min-height: 48px;
+div.post-footer {
+    margin-top: var(--space-2);
 }
 div.comment-form {
-    margin: 16px 0px 16px 32px;
-}
-div.pagination {
-    width: 100%;
-    text-align: right;
-    padding: 0px;
-    margin: 0px;
+    margin: var(--space-3) 0;
 }
 div.flask-pagedown-preview {
-    margin: 10px 0px 10px 0px;
-    border: 1px solid #e0e0e0;
-    padding: 4px;
+    margin: var(--space-2) 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-2);
 }
 div.flask-pagedown-preview h1 {
     font-size: 140%;
@@ -102,9 +295,21 @@ div.flask-pagedown-preview h3 {
 .post-body h3 {
     font-size: 120%;
 }
-.table.followers tr {
-    border-bottom: 1px solid #e0e0e0;
+
+div.pagination {
+    width: 100%;
+    text-align: right;
+    padding: 0;
+    margin: 0;
 }
+
+.table.followers tr {
+    border-bottom: 1px solid var(--color-border);
+}
+
+/* ==========================================================================
+   Notifications
+   ========================================================================== */
 .notification-dropdown {
     position: relative;
 }
