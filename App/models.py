@@ -403,3 +403,23 @@ class Notification(db.Model):
                          comment_id=comment.id)
         db.session.add(n)
         return n
+
+
+class ModerationFlag(db.Model):
+    __tablename__ = 'moderation_flags'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), nullable=True)
+    comment_id = db.Column(db.Integer, db.ForeignKey('comments.id'), nullable=True)
+    source = db.Column(db.String(16))
+    reason = db.Column(db.Text, nullable=True)
+    moderator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    overturned_at = db.Column(db.DateTime, nullable=True)
+    overturned_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+
+    user = db.relationship('User', foreign_keys=[user_id])
+    moderator = db.relationship('User', foreign_keys=[moderator_id])
+    overturned_by = db.relationship('User', foreign_keys=[overturned_by_id])
+    post = db.relationship('Post')
+    comment = db.relationship('Comment')

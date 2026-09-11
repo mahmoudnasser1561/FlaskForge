@@ -26,6 +26,12 @@ class Config:
     CACHE_DEFAULT_TIMEOUT = 60
     GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
     GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
+    REDIS_URL = os.environ.get('REDIS_URL', 'redis://redis:6379/0')
+    MODERATION_QUEUE_NAME = os.environ.get('MODERATION_QUEUE_NAME', 'moderation_queue')
+    MODERATION_HEARTBEAT_KEY = os.environ.get('MODERATION_HEARTBEAT_KEY', 'moderation_agent:heartbeat')
+    MODERATION_SERVICE_TOKEN = os.environ.get('MODERATION_SERVICE_TOKEN')
+    MODERATION_ENABLED = os.environ.get('MODERATION_ENABLED', 'true').lower() in \
+        ['true', 'on', '1']
 
 
     @staticmethod
@@ -44,6 +50,7 @@ class TestingConfig(Config):
     WTF_CSRF_ENABLED = False
     RATELIMIT_ENABLED = False
     CACHE_TYPE = 'NullCache'
+    MODERATION_ENABLED = False
     
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
