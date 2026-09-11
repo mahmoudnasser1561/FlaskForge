@@ -4,6 +4,7 @@ from ..models import Post, Permission
 from . import api
 from .decorators import permission_required
 from .errors import forbidden
+from ..moderation import queue_for_moderation
 
 
 @api.route('/posts/')
@@ -42,6 +43,7 @@ def new_post():
     post.author = g.current_user
     db.session.add(post)
     db.session.commit()
+    queue_for_moderation('post', post)
     return jsonify(post.to_json()), 201, \
         {'Location': url_for('api.get_post', id=post.id, _external=True)}
 

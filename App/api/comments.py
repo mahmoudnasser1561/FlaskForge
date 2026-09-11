@@ -3,6 +3,7 @@ from .. import db
 from ..models import Post, Permission, Comment, Notification
 from . import api
 from .decorators import permission_required
+from ..moderation import queue_for_moderation
 
 
 @api.route('/comments/')
@@ -65,5 +66,6 @@ def new_post_comment(id):
     db.session.flush()
     Notification.create_for_comment(comment)
     db.session.commit()
+    queue_for_moderation('comment', comment)
     return jsonify(comment.to_json()), 201, \
         {'Location': url_for('api.get_comment', id=comment.id, _external=True)}

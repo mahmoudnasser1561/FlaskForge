@@ -9,6 +9,7 @@ from ..email import send_email
 from . import main
 from .forms import NameForm, EDitProfileForm, EditProfileAdminForm, PostForm, CommentForm
 from ..decorators import admin_required, permission_required
+from ..moderation import queue_for_moderation
 
 @main.after_app_request
 def after_request(response):
@@ -36,6 +37,7 @@ def index():
                     author=current_user._get_current_object())
         db.session.add(post)
         db.session.commit()
+        queue_for_moderation('post', post)
         return redirect(url_for('.index'))
     page = request.args.get('page', 1, type=int)
     show_followed = False
@@ -115,6 +117,7 @@ def post(id):
         db.session.flush()
         Notification.create_for_comment(comment)
         db.session.commit()
+        queue_for_moderation('comment', comment)
         flash('Your comment has been published.')
         return redirect(url_for('.post', id=post.id, page=-1))
     page = request.args.get('page', 1, type=int)
@@ -139,6 +142,7 @@ def edit(id):
         post.body = form.body.data
         db.session.add(post)
         db.session.commit()
+        queue_for_moderation('post', post)
         flash('The post has been updated')
         return redirect(url_for('.post', id=post.id))
 
