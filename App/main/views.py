@@ -132,8 +132,7 @@ def post(id):
 @login_required
 def edit(id):
     post = Post.query.get_or_404(id)
-    if current_user != post.author and \
-            not current_user.can(Permission.ADMIN):
+    if current_user != post.author:
         abort(403)
     form = PostForm()
     if form.validate_on_submit():
@@ -274,6 +273,26 @@ def moderate_disable(id):
     db.session.commit()
     return redirect(url_for('.moderate',
                             page=request.args.get('page', 1, type=int)))
+
+@main.route('/moderate/post/enable/<int:id>')
+@login_required
+@permission_required(Permission.MODERATE)
+def moderate_post_enable(id):
+    post = Post.query.get_or_404(id)
+    post.disabled = False
+    db.session.add(post)
+    db.session.commit()
+    return redirect(request.referrer or url_for('.index'))
+
+@main.route('/moderate/post/disable/<int:id>')
+@login_required
+@permission_required(Permission.MODERATE)
+def moderate_post_disable(id):
+    post = Post.query.get_or_404(id)
+    post.disabled = True
+    db.session.add(post)
+    db.session.commit()
+    return redirect(request.referrer or url_for('.index'))
 
 @main.route('/shutdown')
 def server_shutdown():

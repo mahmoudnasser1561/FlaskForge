@@ -303,6 +303,7 @@ class Post(db.Model):
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     author = db.relationship('User', backref=db.backref('posts', lazy='dynamic'))
     comments = db.relationship('Comment', backref='post', lazy='dynamic')
+    disabled = db.Column(db.Boolean)
 
     
     @staticmethod
