@@ -1,6 +1,6 @@
 import hashlib
 
-from flask import Blueprint, current_app, jsonify, request
+from flask import Blueprint, current_app, jsonify, request, url_for
 
 from .. import db
 from ..email import send_email
@@ -55,16 +55,20 @@ def _disable(kind, id):
     row.disabled = True
     db.session.add(row)
 
+    site_url = current_app.config['FLASKY_SITE_URL'].rstrip('/')
+
     if kind == 'post':
         flag = ModerationFlag(source='ai', reason=reason, user_id=row.author_id,
                               post_id=row.id, comment_id=None)
         template = 'moderation/email/post_disabled'
-        template_kwargs = {'post': row, 'reason': reason}
+        link = site_url + url_for('main.post', id=row.id)
+        template_kwargs = {'post': row, 'reason': reason, 'link': link}
     else:
         flag = ModerationFlag(source='ai', reason=reason, user_id=row.author_id,
                               post_id=row.post_id, comment_id=row.id)
         template = 'moderation/email/comment_disabled'
-        template_kwargs = {'comment': row, 'reason': reason}
+        link = site_url + url_for('main.post', id=row.post_id, page=-1)
+        template_kwargs = {'comment': row, 'reason': reason, 'link': link}
 
     db.session.add(flag)
     db.session.commit()

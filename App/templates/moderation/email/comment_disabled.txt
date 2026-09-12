@@ -6,7 +6,7 @@ Reason: {{ reason }}
 
 View or re-enable it here (under the post it was posted on):
 
-{{ url_for('main.post', id=comment.post_id, page=-1, _external=True) }}
+{{ link }}
 
 Sincerely,
 

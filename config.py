@@ -32,6 +32,7 @@ class Config:
     MODERATION_SERVICE_TOKEN = os.environ.get('MODERATION_SERVICE_TOKEN')
     MODERATION_ENABLED = os.environ.get('MODERATION_ENABLED', 'true').lower() in \
         ['true', 'on', '1']
+    FLASKY_SITE_URL = os.environ.get('FLASKY_SITE_URL', 'http://localhost:5000')
 
 
     @staticmethod
