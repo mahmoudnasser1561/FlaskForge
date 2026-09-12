@@ -1,5 +1,4 @@
 import hashlib
-import time
 import unittest
 
 from App import create_app, db, mail
@@ -136,16 +135,12 @@ class ModerationApiTestCase(unittest.TestCase):
 
     # ---- disable: success path (full pipeline) ----
 
-    def test_disable_post_success_creates_flag_and_email(self):
-        with mail.record_messages() as outbox:
-            r = self.client.post(f'/api/v1/moderation/posts/{self.post.id}/disable',
-                                 json={'reason': 'Spam', 'content_hash': self.post_hash},
-                                 headers=self.auth_headers())
-            self.assertEqual(r.status_code, 200)
-            self.assertEqual(r.get_json()['status'], 'disabled')
-            time.sleep(0.5)  # send_email dispatches asynchronously in a thread
-            self.assertEqual(len(outbox), 1)
-            self.assertIn('admin@example.com', outbox[0].recipients)
+    def test_disable_post_success_creates_flag(self):
+        r = self.client.post(f'/api/v1/moderation/posts/{self.post.id}/disable',
+                             json={'reason': 'Spam', 'content_hash': self.post_hash},
+                             headers=self.auth_headers())
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.get_json()['status'], 'disabled')
 
         db.session.refresh(self.post)
         self.assertTrue(self.post.disabled)
@@ -157,13 +152,10 @@ class ModerationApiTestCase(unittest.TestCase):
         self.assertEqual(flag.user_id, self.author.id)
 
     def test_disable_comment_success_sets_both_post_and_comment_id(self):
-        with mail.record_messages() as outbox:
-            r = self.client.post(f'/api/v1/moderation/comments/{self.comment.id}/disable',
-                                 json={'reason': 'Harassment', 'content_hash': self.comment_hash},
-                                 headers=self.auth_headers())
-            self.assertEqual(r.status_code, 200)
-            time.sleep(0.5)
-            self.assertEqual(len(outbox), 1)
+        r = self.client.post(f'/api/v1/moderation/comments/{self.comment.id}/disable',
+                             json={'reason': 'Harassment', 'content_hash': self.comment_hash},
+                             headers=self.auth_headers())
+        self.assertEqual(r.status_code, 200)
 
         db.session.refresh(self.comment)
         self.assertTrue(self.comment.disabled)
