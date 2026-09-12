@@ -85,6 +85,35 @@ Re-running `flask seed` is safe for users and follows (duplicates are
 skipped), but will add *more* posts and comments each time rather than
 replacing them.
 
+### AI content moderation (optional, work in progress)
+
+An optional standalone service reviews new posts/comments and can
+disable anything inappropriate. It's fully decoupled from the main
+app: publishing stays exactly as fast whether this service is running
+or not, and if it's down or absent, nothing breaks — content just
+isn't reviewed until it's back.
+
+The real classification logic isn't built yet. Right now the service
+unconditionally flags everything it sees, purely to prove the pipeline
+itself (queue → review → disable → admin email → audit entry) works
+end to end before a real model gets wired in — see `MODERATION_PLAN.md`
+for the in-progress build log.
+
+To run it:
+```
+docker compose --profile moderation up -d
+```
+This starts the whole stack (`db`, `redis`, `web`) plus the
+`moderation-agent` service in one command — plain `docker compose up
+-d` never starts it. Requires `MODERATION_SERVICE_TOKEN` in `.env` (a
+shared secret between `web` and `moderation-agent`) — see the comments
+in `.env.example`.
+
+When something is disabled, the admin (`FLASKY_ADMIN`) gets an email
+with the reason and a link back to the content, and an entry lands in
+the `moderation_flags` table alongside any manual moderator disables —
+one shared history regardless of source.
+
 ## Security
 
 Login (`/auth/login`) and registration (`/auth/register`) are rate
