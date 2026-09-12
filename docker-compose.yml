@@ -62,6 +62,10 @@ services:
       MODERATION_SERVICE_TOKEN: ${MODERATION_SERVICE_TOKEN:-}
       MODERATION_QUEUE_NAME: ${MODERATION_QUEUE_NAME:-moderation_queue}
       MODERATION_HEARTBEAT_KEY: ${MODERATION_HEARTBEAT_KEY:-moderation_agent:heartbeat}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      BEDROCK_MODEL_ID: ${BEDROCK_MODEL_ID:-amazon.nova-micro-v1:0}
     depends_on:
       redis:
         condition: service_started

@@ -85,19 +85,14 @@ Re-running `flask seed` is safe for users and follows (duplicates are
 skipped), but will add *more* posts and comments each time rather than
 replacing them.
 
-### AI content moderation (optional, work in progress)
+### AI content moderation (optional)
 
-An optional standalone service reviews new posts/comments and can
-disable anything inappropriate. It's fully decoupled from the main
-app: publishing stays exactly as fast whether this service is running
-or not, and if it's down or absent, nothing breaks — content just
-isn't reviewed until it's back.
-
-The real classification logic isn't built yet. Right now the service
-unconditionally flags everything it sees, purely to prove the pipeline
-itself (queue → review → disable → admin email → audit entry) works
-end to end before a real model gets wired in — see `MODERATION_PLAN.md`
-for the in-progress build log.
+An optional standalone service reviews new posts/comments via a model
+on Amazon Bedrock (Nova Micro, chosen for cost) and disables anything
+that violates the policy in `moderation_agent/policy.md`. It's fully
+decoupled from the main app: publishing stays exactly as fast whether
+this service is running or not, and if it's down or absent, nothing
+breaks — content just isn't reviewed until it's back.
 
 To run it:
 ```
@@ -108,6 +103,17 @@ This starts the whole stack (`db`, `redis`, `web`) plus the
 -d` never starts it. Requires `MODERATION_SERVICE_TOKEN` in `.env` (a
 shared secret between `web` and `moderation-agent`) — see the comments
 in `.env.example`.
+
+Real classification additionally needs `AWS_ACCESS_KEY_ID`/
+`AWS_SECRET_ACCESS_KEY`/`AWS_REGION` in `.env`, from an IAM user/role
+with `bedrock:InvokeModel`/`bedrock:Converse` permission on the
+configured `BEDROCK_MODEL_ID`. No separate AWS console setup beyond
+that — serverless Bedrock models auto-enable on an account the first
+time they're actually invoked. Without AWS credentials configured, the
+rest of the pipeline (queue, disable, email, audit trail) still runs
+exactly the same; each job just logs a warning and is skipped rather
+than classified, since a missing verdict is treated as "leave it
+enabled," never as "disable it anyway."
 
 When something is disabled, the admin (`FLASKY_ADMIN`) gets an email
 with the reason and a link back to the content, and an entry lands in
