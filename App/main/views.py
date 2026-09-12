@@ -4,7 +4,7 @@ from flask_login import login_required, current_user
 from flask_sqlalchemy.record_queries import get_recorded_queries
 from sqlalchemy import text
 from .. import db
-from ..models import User, Role, Post, Permission, Comment, Notification
+from ..models import User, Role, Post, Permission, Comment, Notification, ModerationFlag
 from ..email import send_email
 from . import main
 from .forms import NameForm, EDitProfileForm, EditProfileAdminForm, PostForm, CommentForm
@@ -263,6 +263,13 @@ def moderate_enable(id):
     comment = Comment.query.get_or_404(id)
     comment.disabled = False
     db.session.add(comment)
+    flag = ModerationFlag.query.filter_by(
+        comment_id=comment.id, overturned_at=None).order_by(
+        ModerationFlag.timestamp.desc()).first()
+    if flag is not None:
+        flag.overturned_at = datetime.utcnow()
+        flag.overturned_by_id = current_user.id
+        db.session.add(flag)
     db.session.commit()
     return redirect(url_for('.moderate',
                             page=request.args.get('page', 1, type=int)))
@@ -274,6 +281,11 @@ def moderate_disable(id):
     comment = Comment.query.get_or_404(id)
     comment.disabled = True
     db.session.add(comment)
+    flag = ModerationFlag(source='admin', reason=None,
+                          moderator_id=current_user.id,
+                          user_id=comment.author_id,
+                          post_id=comment.post_id, comment_id=comment.id)
+    db.session.add(flag)
     db.session.commit()
     return redirect(url_for('.moderate',
                             page=request.args.get('page', 1, type=int)))
@@ -285,6 +297,13 @@ def moderate_post_enable(id):
     post = Post.query.get_or_404(id)
     post.disabled = False
     db.session.add(post)
+    flag = ModerationFlag.query.filter_by(
+        post_id=post.id, comment_id=None, overturned_at=None).order_by(
+        ModerationFlag.timestamp.desc()).first()
+    if flag is not None:
+        flag.overturned_at = datetime.utcnow()
+        flag.overturned_by_id = current_user.id
+        db.session.add(flag)
     db.session.commit()
     return redirect(request.referrer or url_for('.index'))
 
@@ -295,6 +314,11 @@ def moderate_post_disable(id):
     post = Post.query.get_or_404(id)
     post.disabled = True
     db.session.add(post)
+    flag = ModerationFlag(source='admin', reason=None,
+                          moderator_id=current_user.id,
+                          user_id=post.author_id,
+                          post_id=post.id, comment_id=None)
+    db.session.add(flag)
     db.session.commit()
     return redirect(request.referrer or url_for('.index'))
 
