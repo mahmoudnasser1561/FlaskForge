@@ -1,0 +1,15 @@
+Hello,
+
+The AI moderation service has disabled a post by {{ post.author.username }}.
+
+Reason: {{ reason }}
+
+View or re-enable it here:
+
+{{ url_for('main.post', id=post.id, _external=True) }}
+
+Sincerely,
+
+StaffRoom Team
+
+Note: replies to this email are not monitored.

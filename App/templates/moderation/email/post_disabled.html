@@ -1,0 +1,7 @@
+<p>Hello,</p>
+<p>The AI moderation service has disabled a post by <b>{{ post.author.username }}</b>.</p>
+<p>Reason: {{ reason }}</p>
+<p>View or re-enable it <a href="{{ url_for('main.post', id=post.id, _external=True) }}">here</a>.</p>
+<p>Sincerely,</p>
+<p>The StaffRoom Team</p>
+<p><small>Note: replies to this email address are not monitored.</small></p>

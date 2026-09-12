@@ -1,0 +1,15 @@
+Hello,
+
+The AI moderation service has disabled a comment by {{ comment.author.username }}.
+
+Reason: {{ reason }}
+
+View or re-enable it here (under the post it was posted on):
+
+{{ url_for('main.post', id=comment.post_id, page=-1, _external=True) }}
+
+Sincerely,
+
+StaffRoom Team
+
+Note: replies to this email are not monitored.
