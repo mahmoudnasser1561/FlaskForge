@@ -4,6 +4,7 @@ import redis
 import requests
 
 import config
+from bedrock import classify
 from job import InvalidJobError, parse_job
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
@@ -61,10 +62,6 @@ def call_disable(job, reason):
     return resp.json().get('status')
 
 
-def classify(job):
-    return True, 'Flagged by the stub classifier (pipeline test, not a real policy decision)'
-
-
 def process(job):
     verify_status = call_verify(job)
     if verify_status is None:
@@ -76,7 +73,12 @@ def process(job):
         log.info('%s %s changed since queued, skipping', job.type, job.id)
         return
 
-    flagged, reason = classify(job)
+    try:
+        flagged, reason = classify(job)
+    except Exception as e:
+        log.warning('classification failed for %s %s: %s', job.type, job.id, e)
+        return
+
     if not flagged:
         log.info('%s %s not flagged', job.type, job.id)
         return
