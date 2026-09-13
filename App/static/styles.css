@@ -60,17 +60,32 @@ a:hover, a:focus {
     background-color: var(--color-surface);
     border-color: var(--color-border);
     box-shadow: var(--shadow-sm);
+    min-height: 60px;
 }
 .navbar-inverse .navbar-brand {
     color: var(--color-primary);
     font-weight: 700;
+    height: 60px;
+    line-height: 60px;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 .navbar-inverse .navbar-brand:hover,
 .navbar-inverse .navbar-brand:focus {
     color: var(--color-primary-dark);
 }
+.navbar-inverse .navbar-nav {
+    margin-top: 10px;
+}
+.navbar-inverse .navbar-nav > li {
+    margin-right: 4px;
+}
 .navbar-inverse .navbar-nav > li > a {
-    color: var(--color-text);
+    color: var(--color-text-muted);
+    font-weight: 500;
+    border-radius: var(--radius);
+    padding-top: 8px;
+    padding-bottom: 8px;
     transition: var(--transition);
 }
 .navbar-inverse .navbar-nav > li > a:hover,
@@ -102,6 +117,38 @@ a:hover, a:focus {
 .navbar-inverse .dropdown-menu > li > a:focus {
     color: var(--color-primary);
     background-color: var(--color-primary-light);
+}
+
+.topbar-bell {
+    display: inline-flex;
+    color: var(--color-text-muted);
+    vertical-align: middle;
+    transition: var(--transition);
+}
+.topbar-bell svg {
+    width: 19px;
+    height: 19px;
+}
+.notification-dropdown .dropdown-toggle:hover .topbar-bell,
+.notification-dropdown.open .topbar-bell {
+    color: var(--color-primary);
+}
+.topbar-ping {
+    position: absolute;
+    top: 12px;
+    right: 8px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--color-danger);
+    border: 2px solid var(--color-surface);
+}
+.topbar-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    vertical-align: middle;
 }
 
 /* ==========================================================================
@@ -315,12 +362,6 @@ div.pagination {
    ========================================================================== */
 .notification-dropdown {
     position: relative;
-}
-.notification-badge {
-    position: absolute;
-    top: -2px;
-    right: -6px;
-    padding: 2px 5px;
 }
 .notification-menu {
     min-width: 320px;
