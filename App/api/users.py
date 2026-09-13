@@ -1,7 +1,8 @@
 from flask import jsonify, request, g, current_app, url_for
 from . import api
 from .. import db, cache
-from ..models import User, Post
+from ..models import User, Post, Permission
+from .decorators import permission_required
 from .errors import bad_request
 
 
@@ -48,6 +49,28 @@ def edit_user():
     db.session.add(g.current_user)
     db.session.commit()
     return jsonify(g.current_user.to_json())
+
+
+@api.route('/users/<int:id>/follow', methods=['POST'])
+@permission_required(Permission.FOLLOW)
+def follow_user(id):
+    user = User.query.get_or_404(id)
+    if g.current_user.is_following(user):
+        return bad_request('You are already following this user.')
+    g.current_user.follow(user)
+    db.session.commit()
+    return jsonify(user.to_json())
+
+
+@api.route('/users/<int:id>/follow', methods=['DELETE'])
+@permission_required(Permission.FOLLOW)
+def unfollow_user(id):
+    user = User.query.get_or_404(id)
+    if not g.current_user.is_following(user):
+        return bad_request('You are not following this user.')
+    g.current_user.unfollow(user)
+    db.session.commit()
+    return jsonify(user.to_json())
 
 
 @api.route('/users/<int:id>/timeline/')
