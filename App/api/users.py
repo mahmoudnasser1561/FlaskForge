@@ -51,6 +51,20 @@ def edit_user():
     return jsonify(g.current_user.to_json())
 
 
+@api.route('/users/me/password', methods=['PUT'])
+def change_password():
+    old_password = request.json.get('old_password')
+    new_password = request.json.get('new_password')
+    if not old_password or not new_password:
+        return bad_request('old_password and new_password are required')
+    if not g.current_user.verify_password(old_password):
+        return bad_request('Invalid password.')
+    g.current_user.password = new_password
+    db.session.add(g.current_user)
+    db.session.commit()
+    return jsonify(g.current_user.to_json())
+
+
 @api.route('/users/<int:id>/follow', methods=['POST'])
 @permission_required(Permission.FOLLOW)
 def follow_user(id):
