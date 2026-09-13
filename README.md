@@ -2,24 +2,126 @@
 
 ![CI](https://github.com/mahmoudnasser1561/FlaskForge/actions/workflows/ci.yml/badge.svg)
 
-StaffRoom is a full-stack internal forum for teams, built with Flask — a
-private space for coworkers to post updates, comment, and keep up with
-what teammates are working on.
-This project demonstrates modern Flask practices — including authentication, user roles, admin control, databases, pagination.
+StaffRoom is a full-stack internal forum for teams, built with Flask —
+a private space for coworkers to post updates, comment, and keep up
+with what teammates are working on. Built and iterated on over roughly
+18 months (162 commits, March 2025 – September 2026), it started as a
+demonstration of core Flask fundamentals (auth, roles, database
+migrations, pagination) and grew into a production-shaped app: a
+role-based permission system, a versioned JSON API, Redis-backed rate
+limiting and caching, "Sign in with Google," and an optional AI
+content-moderation service built on Amazon Bedrock — all containerized,
+all covered by an automated test suite, all running in CI on every
+push.
 
 ## Features
-1. User registration & authentication (login/logout)
-2. User profiles and avatar images via Gravatar
-4. Create, edit, and delete posts
-5. Pagination for posts
-6. Admin control
-7. Email notifications & password reset
-8. Database migrations with Flask-Migrate
-9. Unit tests for core functionality
 
-<img width="841" height="210" alt="Untitled Diagram-Page-3 drawio(5)" src="https://github.com/user-attachments/assets/5a66e4e9-7648-4a09-80a3-5152b5107d75" />
+**Core forum**
+- Markdown posts and comments (Flask-PageDown, live preview client-side,
+  server-side rendering via `markdown` + `bleach` HTML sanitization)
+- Follow/unfollow other users, with a personal "followed only" feed
+- User profiles: bio, location, member-since/last-seen timestamps,
+  Gravatar avatars
+- Paginated feeds, comment threads, and follower/following lists
 
-<img width="201" height="370" alt="Untitled Diagram-Page-3 drawio(6)" src="https://github.com/user-attachments/assets/0e592505-1797-4679-9096-460115c81315" />
+**Accounts, roles, and moderation**
+- Email/password auth (Flask-Login) plus "Sign in with Google"
+  (Authlib/OAuth2), with automatic account linking by email
+- Three built-in roles (`User`, `Moderator`, `Administrator`) backed by
+  a bitmask permission system (`FOLLOW`, `COMMENT`, `WRITE`,
+  `MODERATE`, `ADMIN`) — not a hardcoded `is_admin` flag
+- Moderators can disable/enable individual posts or comments; authors
+  can only edit their own content — admins were deliberately *not*
+  given a bypass to rewrite other people's posts, enforced identically
+  in the web app and the API
+- A single `moderation_flags` audit table records every disable/enable,
+  whether triggered by a human moderator or the AI service, including
+  who did it and whether it was later reversed
+- Email confirmation, password reset, and email-change flows, all
+  sent asynchronously so the request thread never blocks on SMTP
+
+**Notifications & API**
+- In-app notification bell when someone comments on your post (schema
+  designed with a generic `verb` + nullable post/comment references,
+  so new notification types don't need a migration); also exposed via
+  the API, with unread notifications marked read as they're fetched
+- A versioned, token-authenticated JSON API (`/api/v1/`) with
+  HATEOAS-style pagination links throughout — complete enough to drive
+  a native mobile client for every core in-app action: posting,
+  commenting, following/unfollowing, followers/following lists,
+  profile editing, password/email changes, notifications, and
+  moderator disable/enable. (Account creation and Google sign-in are
+  still web-only.)
+
+**AI-assisted content moderation (optional)**
+- A standalone service reviews new posts/comments against a written
+  policy via a model on Amazon Bedrock and disables anything that
+  violates it — fully decoupled from the main app (see
+  [Engineering highlights](#engineering-highlights) and
+  [`MODERATION_PLAN.md`](MODERATION_PLAN.md) for the full design)
+
+**Infrastructure & reliability**
+- Docker Compose stack (`db`, `redis`, `web`, optional
+  `moderation-agent`), health-checked and ready to use with one command
+- Redis-backed rate limiting and response caching — correct across
+  gunicorn's multiple worker processes, not per-worker
+- Database migrations via Flask-Migrate/Alembic
+- Automated test suite (`flask test`, coverage support built in) run
+  on every push and PR via GitHub Actions
+
+## Tech stack
+
+**Backend:** Flask 3, Flask-SQLAlchemy, Flask-Migrate (Alembic),
+Flask-Login, Flask-WTF, Flask-Mail, Flask-Bootstrap, Flask-PageDown,
+Flask-Limiter, Flask-Caching, Flask-HTTPAuth, Authlib (Google OAuth)
+**Data:** PostgreSQL, Redis
+**AI moderation:** boto3 (Amazon Bedrock Runtime), a standalone Python
+service with its own Dockerfile and dependency set
+**Infra:** Docker / Docker Compose, gunicorn, GitHub Actions CI
+**Testing:** Python `unittest`, run in CI on every push/PR
+
+## Engineering highlights
+
+A few decisions worth calling out specifically, since "it works" is a
+lower bar than "it's built to fail safely":
+
+- **The AI moderation pipeline can never slow down or break publishing.**
+  Posting a comment does one fast, local, best-effort Redis push and
+  returns — it never waits on the moderation service or on Bedrock. If
+  that service is down or was never started, the app detects this via
+  a heartbeat key and skips the push entirely (one calm log line, no
+  error), so no backlog ever builds up waiting for a consumer that
+  isn't there.
+- **Moderation decisions are hash-checked against staleness, twice.**
+  Every job carries a hash of the content at the moment it was queued.
+  Before spending a Bedrock call, and again right before disabling
+  anything, the app recomputes the content's *current* hash and
+  compares it — so content edited or deleted between being queued and
+  being reviewed is never acted on based on a stale snapshot.
+- **The AI's permissions are constrained structurally, not just by
+  prompt wording.** The model is given exactly one callable tool per
+  review — flag this content, with a reason — and the schema never
+  includes an id parameter; the id is supplied by the agent's own code,
+  which already knows it from the job. The model literally cannot name
+  a different target, which closes off a whole class of prompt
+  injection where reviewed content tries to redirect the action
+  elsewhere.
+- **One audit trail, regardless of who or what moderated something.**
+  Human moderator actions and AI actions both write to the same
+  `moderation_flags` table — source, reason, moderator/AI attribution,
+  and whether it was later overturned. It's already shaped to support
+  a future automated-enforcement feature (e.g. flag accounts with
+  repeated violations) without another migration.
+- **Least-privilege AWS access.** The moderation service's IAM policy
+  grants exactly `bedrock:InvokeModel`/`bedrock:Converse` on one
+  specific model ARN — not the broad `AmazonBedrockFullAccess` managed
+  policy.
+- **CI caught real bugs, not just style nits.** Setting up the GitHub
+  Actions pipeline surfaced a test runner that discarded its exit code
+  (so a failing test suite was silently reported as green) and three
+  dependency version pins that only broke on a fresh install outside
+  Docker's cached layers — both fixed, both now guarded against by the
+  pipeline that found them.
 
 ## Getting Started
 
@@ -85,48 +187,29 @@ Re-running `flask seed` is safe for users and follows (duplicates are
 skipped), but will add *more* posts and comments each time rather than
 replacing them.
 
-### AI content moderation (optional)
+## Testing
 
-An optional standalone service reviews new posts/comments via a model
-on Amazon Bedrock (Nova Micro, chosen for cost) and disables anything
-that violates the policy in `moderation_agent/policy.md`. It's fully
-decoupled from the main app: publishing stays exactly as fast whether
-this service is running or not, and if it's down or absent, nothing
-breaks — content just isn't reviewed until it's back.
-
-To run it:
 ```
-docker compose --profile moderation up -d
+flask test
 ```
-This starts the whole stack (`db`, `redis`, `web`) plus the
-`moderation-agent` service in one command — plain `docker compose up
--d` never starts it. Requires `MODERATION_SERVICE_TOKEN` in `.env` (a
-shared secret between `web` and `moderation-agent`) — see the comments
-in `.env.example`.
-
-Real classification additionally needs `AWS_ACCESS_KEY_ID`/
-`AWS_SECRET_ACCESS_KEY`/`AWS_REGION` in `.env`, from an IAM user/role
-with `bedrock:InvokeModel`/`bedrock:Converse` permission on the
-configured `BEDROCK_MODEL_ID`. No separate AWS console setup beyond
-that — serverless Bedrock models auto-enable on an account the first
-time they're actually invoked. Without AWS credentials configured, the
-rest of the pipeline (queue, disable, email, audit trail) still runs
-exactly the same; each job just logs a warning and is skipped rather
-than classified, since a missing verdict is treated as "leave it
-enabled," never as "disable it anyway."
-
-When something is disabled, the admin (`FLASKY_ADMIN`) gets an email
-with the reason and a link back to the content, and an entry lands in
-the `moderation_flags` table alongside any manual moderator disables —
-one shared history regardless of source.
+runs the full `unittest` suite (models, API, auth flows, notifications,
+moderation routes). Add `--coverage` to also generate a coverage report:
+```
+flask test --coverage
+```
+The same suite runs automatically on every push and pull request via
+GitHub Actions (see the badge at the top of this file).
 
 ## Security
 
 Login (`/auth/login`) and registration (`/auth/register`) are rate
 limited per IP address (10 login attempts/minute, 5 registrations/hour;
 only `POST` submissions count, so browsing the pages freely never trips
-it) to slow down password-guessing and mass account creation. The limiter
-is backed by Redis (the `redis` service in `docker-compose.yml`) so the
+it) to slow down password-guessing and mass account creation. The API's
+token-issuing endpoint (`POST /api/v1/tokens/`) carries the same
+10/minute limit, since it's just as viable a target for credential
+stuffing as the web login form. The limiter is backed by Redis (the
+`redis` service in `docker-compose.yml`) so the
 limit is enforced correctly across gunicorn's multiple worker processes —
 without a shared backend, each worker would track its own count and the
 real limit would silently be higher than configured. Set `REDIS_URL` to
@@ -140,14 +223,125 @@ above) to reduce DB load on repeated reads — a change made within that
 window (e.g. a new post) can take up to 60s to show up in these three
 endpoints. Write endpoints are never cached.
 
+The AI moderation service's AWS credentials follow the same
+least-privilege principle: see [AI content moderation](#ai-content-moderation-optional)
+below for the exact IAM policy used.
+
 ## Sign in with Google
 
 In addition to the normal email/password login, users can sign in or
-sign up with a Google account. This requires `GOOGLE_CLIENT_ID` and
-`GOOGLE_CLIENT_SECRET` in `.env` — see the comments in `.env.example`
-for how to create them in Google Cloud Console. The redirect URI
-registered there must exactly match `/auth/google/callback` on whatever
-host you're running on (`http://localhost:5000/auth/google/callback`
-for local Docker use). If a Google sign-in's email matches an existing
-password-based account, the Google identity is linked to it (the
-password keeps working); otherwise a new account is created.
+sign up with a Google account. If a Google sign-in's email matches an
+existing password-based account, the Google identity is linked to it
+(the password keeps working); otherwise a new account is created.
+
+**Setup:**
+
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/)
+   and create a new project (or select an existing one).
+2. Under **APIs & Services → OAuth consent screen**, configure the
+   consent screen: choose **External** (unless you have a Google
+   Workspace org and want **Internal**), fill in an app name and
+   support email, and add the `openid`, `email`, and `profile` scopes
+   (these are exactly what this app requests — nothing more).
+3. Under **APIs & Services → Credentials**, click **Create Credentials
+   → OAuth client ID**, choose **Web application**, and add an
+   **Authorized redirect URI** of:
+   ```
+   http://localhost:5000/auth/google/callback
+   ```
+   (substitute your real domain in production — this must match
+   exactly, including the scheme).
+4. Copy the generated **Client ID** and **Client secret** into `.env`:
+   ```
+   GOOGLE_CLIENT_ID=<your-client-id>
+   GOOGLE_CLIENT_SECRET=<your-client-secret>
+   ```
+5. Restart the app (`docker compose up -d --build web` or restart
+   `flask run`) so the new environment variables are picked up.
+6. Test it: go to `/auth/login` and click "Sign in with Google" — you
+   should be redirected to Google, then back to the app, signed in.
+
+## AI content moderation (optional)
+
+A standalone service reviews new posts/comments via a model on Amazon
+Bedrock (**Nova Micro**, chosen specifically for cost — roughly
+$0.035/$0.14 per million input/output tokens, well under $0.001 per
+classification at this app's prompt size) and disables anything that
+violates the policy defined in
+[`moderation_agent/policy.md`](moderation_agent/policy.md) — six
+categories (harassment, hate speech, sexual content, promotion of
+illegal activity, spam/scam links, dangerous misinformation), each
+with worked "flag this / don't flag this" examples so the model has
+concrete boundaries, not just abstract rules.
+
+It's fully decoupled from the main app: publishing stays exactly as
+fast whether this service is running or not, and if it's down or
+absent, nothing breaks — content just isn't reviewed until it's back.
+See [Engineering highlights](#engineering-highlights) above and
+[`MODERATION_PLAN.md`](MODERATION_PLAN.md) for the full design and
+build log.
+
+**Setup:**
+
+1. **Create (or reuse) an IAM user or role** you can generate access
+   keys for. No Bedrock-specific account setup is needed beyond this —
+   AWS retired the old "Model access" console step; serverless models
+   like Nova Micro auto-enable on an account the first time they're
+   actually invoked.
+2. **Grant it least-privilege Bedrock access** — exactly
+   `InvokeModel`/`Converse` (and their streaming variants) on the one
+   model this app uses, nothing account-wide. Either via the AWS CLI:
+   ```bash
+   cat > bedrock-policy.json <<'EOF'
+   {
+     "Version": "2012-10-17",
+     "Statement": [
+       {
+         "Sid": "StaffRoomModerationNovaMicroInvoke",
+         "Effect": "Allow",
+         "Action": [
+           "bedrock:InvokeModel",
+           "bedrock:InvokeModelWithResponseStream",
+           "bedrock:Converse",
+           "bedrock:ConverseStream"
+         ],
+         "Resource": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0"
+       }
+     ]
+   }
+   EOF
+   aws iam put-user-policy \
+     --user-name <your-iam-user> \
+     --policy-name StaffRoomBedrockModerationAccess \
+     --policy-document file://bedrock-policy.json
+   ```
+   or via the console: **IAM → Users → (your user) → Add permissions →
+   Create inline policy → JSON tab**, paste the same document, and
+   name it.
+3. **Get an access key** for that user (`aws iam create-access-key
+   --user-name <your-iam-user>`, or **IAM console → your user →
+   Security credentials → Create access key**).
+4. **Add to `.env`**:
+   ```
+   MODERATION_SERVICE_TOKEN=<generate with: python3 -c "import secrets; print(secrets.token_hex(32))">
+   AWS_ACCESS_KEY_ID=<your-access-key-id>
+   AWS_SECRET_ACCESS_KEY=<your-secret-access-key>
+   AWS_REGION=us-east-1
+   ```
+   (change `AWS_REGION` and the resource ARN's region in step 2
+   together if you use a different region).
+5. **Start it** — this is a separate opt-in service, so it needs its
+   own flag:
+   ```
+   docker compose --profile moderation up -d --build
+   ```
+   Plain `docker compose up` (no profile) never starts it.
+6. **Verify it's working**: post something on the site, then check
+   ```
+   docker compose logs moderation-agent
+   ```
+   for a `not flagged` or `disabled: <reason>` line within a few
+   seconds. Posting something that clearly matches one of
+   `policy.md`'s categories should get disabled automatically, with
+   the reason visible both in the logs and in an email to
+   `FLASKY_ADMIN`.
