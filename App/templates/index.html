@@ -5,23 +5,27 @@
 {% block title %}StaffRoom{% endblock %}
 
 {% block page_content %}
-<div class="page-header">
-    <h1>Hello, {% if current_user.is_authenticated %}{{ current_user.username }}{% else %}Stranger{% endif %}!</h1>
-    <p>The local date and time is {{ moment(current_time).format('LLL') }}</p>
-    <p>That was {{ moment(current_time).fromNow(refresh=True) }}</p>
+<div class="page-head">
+    <h1>Feed</h1>
+    <span class="feed-count">{{ pagination.total }} post{{ 's' if pagination.total != 1 else '' }}</span>
 </div>
-<div>
-    {% if current_user.can(Permission.WRITE) %}
-        {{ wtf.quick_form(form) }}
-    {% endif %}
+{% if current_user.can(Permission.WRITE) %}
+<div class="composer">
+    <div class="composer-row">
+        <img class="composer-avatar" src="{{ current_user.gravatar(size=36) }}">
+        <div class="composer-form">
+            {{ wtf.quick_form(form) }}
+        </div>
+    </div>
 </div>
+{% endif %}
 <div class="post-tabs">
-    <ul class="nav nav-tabs">
-        <li{% if not show_followed %} class="active"{% endif %}><a href="{{ url_for('.show_all') }}">All</a></li>
+    <div class="segmented">
+        <a{% if not show_followed %} class="active"{% endif %} href="{{ url_for('.show_all') }}">All</a>
         {% if current_user.is_authenticated %}
-        <li{% if show_followed %} class="active"{% endif %}><a href="{{ url_for('.show_followed') }}">Followed</a></li>
+        <a{% if show_followed %} class="active"{% endif %} href="{{ url_for('.show_followed') }}">Followed</a>
         {% endif %}
-    </ul>
+    </div>
     {% include '_posts.html' %}
 </div>
 {% if pagination %}
