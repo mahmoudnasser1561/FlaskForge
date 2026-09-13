@@ -243,18 +243,90 @@ a:hover, a:focus {
 /* ==========================================================================
    Profile page
    ========================================================================== */
-.page-header > .profile-thumbnail {
-    position: absolute;
+.profile-card {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--space-4);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-4);
+    margin-bottom: var(--space-4);
 }
-.profile-header {
-    min-height: 260px;
-    margin-left: 280px;
+.profile-avatar {
+    border-radius: 50%;
+    width: 96px;
+    height: 96px;
+    flex: 0 0 auto;
 }
-@media (max-width: 767px) {
-    .profile-header {
-        margin-left: 0;
-        margin-top: 280px;
-    }
+.profile-info {
+    flex: 1 1 260px;
+    min-width: 0;
+}
+.profile-info h1 {
+    margin: 0;
+    font-size: 20px;
+}
+.profile-name {
+    font-weight: 500;
+    color: var(--color-text-muted);
+    font-size: 14px;
+}
+.profile-meta {
+    margin-top: var(--space-1);
+    color: var(--color-text-muted);
+    font-size: 13.5px;
+}
+.profile-meta-dot {
+    color: var(--color-border);
+    margin: 0 2px;
+}
+.profile-bio {
+    margin: var(--space-2) 0 0;
+    max-width: 60ch;
+}
+.profile-stats {
+    display: flex;
+    gap: var(--space-4);
+    margin-top: var(--space-3);
+}
+.profile-stat {
+    text-align: left;
+    color: var(--color-text);
+}
+.profile-stat:hover,
+.profile-stat:focus {
+    text-decoration: none;
+}
+.profile-stat b {
+    display: block;
+    font-size: 16px;
+}
+.profile-stat span {
+    font-size: 12px;
+    color: var(--color-text-muted);
+}
+.profile-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+    flex: 0 0 auto;
+}
+.chip {
+    display: inline-flex;
+    align-items: center;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 999px;
+}
+.chip-neutral {
+    background-color: var(--color-background);
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
 }
 
 /* ==========================================================================
