@@ -3,6 +3,7 @@ from flask_httpauth import HTTPBasicAuth
 from ..models import User
 from . import api
 from .errors import unauthorized, forbidden
+from .. import limiter
 
 auth = HTTPBasicAuth()
 
@@ -37,6 +38,7 @@ def before_request():
 
 
 @api.route('/tokens/', methods=['POST'])
+@limiter.limit("10 per minute")
 def get_token():
     if g.current_user.is_anonymous or g.token_used:
         return unauthorized('Invalid credentials')
