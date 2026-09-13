@@ -73,6 +73,52 @@ def unfollow_user(id):
     return jsonify(user.to_json())
 
 
+@api.route('/users/<int:id>/followers/')
+def get_user_followers(id):
+    user = User.query.get_or_404(id)
+    page = request.args.get('page', 1, type=int)
+    pagination = user.followers.paginate(
+        page=page, per_page=current_app.config['FLASKY_FOLLOWERS_PER_PAGE'],
+        error_out=False)
+    follows = pagination.items
+    prev = None
+    if pagination.has_prev:
+        prev = url_for('api.get_user_followers', id=id, page=page-1)
+    next = None
+    if pagination.has_next:
+        next = url_for('api.get_user_followers', id=id, page=page+1)
+    return jsonify({
+        'followers': [{'user': f.follower.to_json(), 'timestamp': f.timestamp}
+                      for f in follows],
+        'prev': prev,
+        'next': next,
+        'count': pagination.total
+    })
+
+
+@api.route('/users/<int:id>/following/')
+def get_user_following(id):
+    user = User.query.get_or_404(id)
+    page = request.args.get('page', 1, type=int)
+    pagination = user.followed.paginate(
+        page=page, per_page=current_app.config['FLASKY_FOLLOWERS_PER_PAGE'],
+        error_out=False)
+    follows = pagination.items
+    prev = None
+    if pagination.has_prev:
+        prev = url_for('api.get_user_following', id=id, page=page-1)
+    next = None
+    if pagination.has_next:
+        next = url_for('api.get_user_following', id=id, page=page+1)
+    return jsonify({
+        'following': [{'user': f.followed.to_json(), 'timestamp': f.timestamp}
+                      for f in follows],
+        'prev': prev,
+        'next': next,
+        'count': pagination.total
+    })
+
+
 @api.route('/users/<int:id>/timeline/')
 def get_user_followed_posts(id):
     user = User.query.get_or_404(id)

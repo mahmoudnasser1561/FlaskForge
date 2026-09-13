@@ -1,6 +1,7 @@
+from datetime import datetime
 from flask import jsonify, request, g, url_for, current_app
 from .. import db
-from ..models import Post, Permission, Comment, Notification
+from ..models import Post, Permission, Comment, Notification, ModerationFlag
 from . import api
 from .decorators import permission_required
 from ..moderation import queue_for_moderation
@@ -69,3 +70,37 @@ def new_post_comment(id):
     queue_for_moderation('comment', comment)
     return jsonify(comment.to_json()), 201, \
         {'Location': url_for('api.get_comment', id=comment.id, _external=True)}
+
+
+@api.route('/comments/<int:id>/disable', methods=['POST'])
+@permission_required(Permission.MODERATE)
+def disable_comment(id):
+    comment = Comment.query.get_or_404(id)
+    if not comment.disabled:
+        comment.disabled = True
+        db.session.add(comment)
+        flag = ModerationFlag(source='admin', reason=None,
+                              moderator_id=g.current_user.id,
+                              user_id=comment.author_id,
+                              post_id=comment.post_id, comment_id=comment.id)
+        db.session.add(flag)
+        db.session.commit()
+    return jsonify(comment.to_json())
+
+
+@api.route('/comments/<int:id>/enable', methods=['POST'])
+@permission_required(Permission.MODERATE)
+def enable_comment(id):
+    comment = Comment.query.get_or_404(id)
+    if comment.disabled:
+        comment.disabled = False
+        db.session.add(comment)
+        flag = ModerationFlag.query.filter_by(
+            comment_id=comment.id, overturned_at=None).order_by(
+            ModerationFlag.timestamp.desc()).first()
+        if flag is not None:
+            flag.overturned_at = datetime.utcnow()
+            flag.overturned_by_id = g.current_user.id
+            db.session.add(flag)
+        db.session.commit()
+    return jsonify(comment.to_json())

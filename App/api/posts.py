@@ -1,6 +1,7 @@
+from datetime import datetime
 from flask import jsonify, request, g, url_for, current_app
 from .. import db, cache
-from ..models import Post, Permission
+from ..models import Post, Permission, ModerationFlag
 from . import api
 from .decorators import permission_required
 from .errors import forbidden
@@ -57,4 +58,38 @@ def edit_post(id):
     post.body = request.json.get('body', post.body)
     db.session.add(post)
     db.session.commit()
+    return jsonify(post.to_json())
+
+
+@api.route('/posts/<int:id>/disable', methods=['POST'])
+@permission_required(Permission.MODERATE)
+def disable_post(id):
+    post = Post.query.get_or_404(id)
+    if not post.disabled:
+        post.disabled = True
+        db.session.add(post)
+        flag = ModerationFlag(source='admin', reason=None,
+                              moderator_id=g.current_user.id,
+                              user_id=post.author_id,
+                              post_id=post.id, comment_id=None)
+        db.session.add(flag)
+        db.session.commit()
+    return jsonify(post.to_json())
+
+
+@api.route('/posts/<int:id>/enable', methods=['POST'])
+@permission_required(Permission.MODERATE)
+def enable_post(id):
+    post = Post.query.get_or_404(id)
+    if post.disabled:
+        post.disabled = False
+        db.session.add(post)
+        flag = ModerationFlag.query.filter_by(
+            post_id=post.id, comment_id=None, overturned_at=None).order_by(
+            ModerationFlag.timestamp.desc()).first()
+        if flag is not None:
+            flag.overturned_at = datetime.utcnow()
+            flag.overturned_by_id = g.current_user.id
+            db.session.add(flag)
+        db.session.commit()
     return jsonify(post.to_json())

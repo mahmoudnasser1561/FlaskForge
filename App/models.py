@@ -326,7 +326,8 @@ class Post(db.Model):
             'timestamp': self.timestamp,
             'author_url': url_for('api.get_user', id=self.author_id),
             'comments_url': url_for('api.get_post_comments', id=self.id),
-            'comment_count': self.comments.count()
+            'comment_count': self.comments.count(),
+            'disabled': bool(self.disabled)
         }
         return json_post
 
@@ -365,6 +366,7 @@ class Comment(db.Model):
             'body_html': self.body_html,
             'timestamp': self.timestamp,
             'author_url': url_for('api.get_user', id=self.author_id),
+            'disabled': bool(self.disabled)
         }
         return json_comment
 
@@ -394,6 +396,17 @@ class Notification(db.Model):
     actor = db.relationship('User', foreign_keys=[actor_id])
     post = db.relationship('Post')
     comment = db.relationship('Comment')
+
+    def to_json(self):
+        json_notification = {
+            'actor_url': url_for('api.get_user', id=self.actor_id),
+            'verb': self.verb,
+            'post_url': url_for('api.get_post', id=self.post_id) if self.post_id else None,
+            'comment_url': url_for('api.get_comment', id=self.comment_id) if self.comment_id else None,
+            'timestamp': self.timestamp,
+            'read': self.read
+        }
+        return json_notification
 
     @staticmethod
     def create_for_comment(comment):
