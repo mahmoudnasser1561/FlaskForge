@@ -147,7 +147,7 @@ def edit(id):
         return redirect(url_for('.post', id=post.id))
 
     form.body.data = post.body
-    return render_template('edit_post.html', form=form)
+    return render_template('edit_post.html', form=form, post=post)
     
 @main.route('/follow/<username>')
 @login_required

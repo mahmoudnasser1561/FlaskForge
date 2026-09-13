@@ -241,6 +241,26 @@ a:hover, a:focus {
 }
 
 /* ==========================================================================
+   Form card (edit post, edit profile, change password/email, auth)
+   ========================================================================== */
+.form-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-4);
+    max-width: 480px;
+    margin: 0 auto;
+}
+.form-card-title {
+    margin: 0 0 var(--space-3);
+    font-size: 19px;
+}
+.form-card .btn-default {
+    margin-top: var(--space-1);
+}
+
+/* ==========================================================================
    Profile page
    ========================================================================== */
 .profile-card {
