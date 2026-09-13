@@ -1,7 +1,8 @@
-from flask import jsonify, request, current_app, url_for
+from flask import jsonify, request, g, current_app, url_for
 from . import api
-from .. import cache
+from .. import db, cache
 from ..models import User, Post
+from .errors import bad_request
 
 
 @api.route('/users/<int:id>')
@@ -31,6 +32,22 @@ def get_user_posts(id):
         'next': next,
         'count': pagination.total
     })
+
+
+@api.route('/users/me', methods=['PUT'])
+def edit_user():
+    name = request.json.get('name', g.current_user.name)
+    location = request.json.get('location', g.current_user.location)
+    if name and len(name) > 64:
+        return bad_request('name must be 64 characters or fewer')
+    if location and len(location) > 64:
+        return bad_request('location must be 64 characters or fewer')
+    g.current_user.name = name
+    g.current_user.location = location
+    g.current_user.about_me = request.json.get('about_me', g.current_user.about_me)
+    db.session.add(g.current_user)
+    db.session.commit()
+    return jsonify(g.current_user.to_json())
 
 
 @api.route('/users/<int:id>/timeline/')
