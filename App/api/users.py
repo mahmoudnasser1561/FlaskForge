@@ -1,6 +1,7 @@
 from flask import jsonify, request, g, current_app, url_for
 from . import api
 from .. import db, cache
+from ..email import send_email
 from ..models import User, Post, Permission
 from .decorators import permission_required
 from .errors import bad_request
@@ -61,6 +62,36 @@ def change_password():
         return bad_request('Invalid password.')
     g.current_user.password = new_password
     db.session.add(g.current_user)
+    db.session.commit()
+    return jsonify(g.current_user.to_json())
+
+
+@api.route('/users/me/email', methods=['POST'])
+def change_email_request():
+    new_email = request.json.get('new_email')
+    password = request.json.get('password')
+    if not new_email or not password:
+        return bad_request('new_email and password are required')
+    if not g.current_user.verify_password(password):
+        return bad_request('Invalid email or password.')
+    new_email = new_email.lower()
+    if len(new_email) > 64 or '@' not in new_email:
+        return bad_request('new_email must be a valid email address')
+    if User.query.filter_by(email=new_email).first():
+        return bad_request('Email already registered.')
+    token = g.current_user.generate_email_change_token(new_email)
+    send_email(new_email, 'Confirm your email address',
+               'api/email/change_email', user=g.current_user, token=token)
+    return jsonify({'message': 'A confirmation email has been sent to the new address.'})
+
+
+@api.route('/users/me/email/confirm', methods=['POST'])
+def change_email_confirm():
+    token = request.json.get('token')
+    if not token:
+        return bad_request('token is required')
+    if not g.current_user.change_email(token):
+        return bad_request('Invalid or expired token.')
     db.session.commit()
     return jsonify(g.current_user.to_json())
 
