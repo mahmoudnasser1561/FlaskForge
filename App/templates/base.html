@@ -47,7 +47,7 @@
                     </a>
                     <ul class="dropdown-menu notification-menu">
                         {% for n in recent_notifications %}
-                        <li>{{ macros.render_notification(n) }}</li>
+                        <li class="notification-item">{{ macros.render_notification(n) }}</li>
                         {% else %}
                         <li class="text-muted" style="padding: 8px 16px;">No notifications yet.</li>
                         {% endfor %}
