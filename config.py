@@ -33,6 +33,8 @@ class Config:
     MODERATION_ENABLED = os.environ.get('MODERATION_ENABLED', 'true').lower() in \
         ['true', 'on', '1']
     FLASKY_SITE_URL = os.environ.get('FLASKY_SITE_URL', 'http://localhost:5000')
+    CHATBOT_SERVICE_URL = os.environ.get('CHATBOT_SERVICE_URL', '')
+    CHATBOT_SERVICE_TOKEN = os.environ.get('CHATBOT_SERVICE_TOKEN', '')
 
 
     @staticmethod

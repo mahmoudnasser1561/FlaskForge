@@ -90,4 +90,30 @@
 {% block scripts %}
 {{ super() }}
 {{ moment.include_moment() }}
+<div id="chat-widget">
+    <button type="button" id="chat-launcher" aria-haspopup="dialog" aria-expanded="false" aria-label="Open policy assistant chat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.5 8.5 0 0 1-11.8 7.8L4 21l1.8-5A8.5 8.5 0 1 1 21 11.5Z"/></svg>
+    </button>
+    <div id="chat-panel" role="dialog" aria-label="Policy assistant chat" hidden>
+        <div class="chat-panel-head">
+            <span>Policy Assistant</span>
+            <button type="button" id="chat-close" aria-label="Close chat">&times;</button>
+        </div>
+        <div id="chat-unavailable" hidden>
+            <div class="chat-unavailable-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="9"/></svg>
+            </div>
+            <p>The policy assistant isn't running right now.</p>
+            <button type="button" id="chat-refresh" class="btn btn-primary btn-sm">Refresh</button>
+        </div>
+        <div id="chat-chatting" hidden>
+            <div id="chat-messages"></div>
+            <form id="chat-form">
+                <input type="text" id="chat-input" placeholder="Ask about our policies&hellip;" autocomplete="off" maxlength="500">
+                <button type="submit">Send</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='chat.js') }}"></script>
 {% endblock %}
