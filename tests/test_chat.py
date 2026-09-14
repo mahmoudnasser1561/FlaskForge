@@ -61,7 +61,7 @@ class ChatTestCase(unittest.TestCase):
         self.configure_service(url='', token='')
         r = self.client.post('/chat', json={'message': 'What are the rules?'})
         self.assertEqual(r.status_code, 503)
-        self.assertEqual(r.get_json()['error'], 'unavailable')
+        self.assertEqual(r.get_json()['status'], 'error')
 
     def test_send_message_unavailable_when_unreachable(self):
         self.configure_service(url='http://127.0.0.1:1')
