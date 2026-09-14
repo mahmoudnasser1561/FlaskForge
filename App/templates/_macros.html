@@ -2,7 +2,7 @@
 <a href="{{ url_for('main.user', username=notification.actor.username) }}">
     <img class="img-rounded" src="{{ notification.actor.gravatar(size=24) }}">
 </a>
-<a href="{{ url_for('main.user', username=notification.actor.username) }}">{{ notification.actor.username }}</a>
+<a href="{{ url_for('main.user', username=notification.actor.username) }}"><strong>{{ notification.actor.username }}</strong></a>
 {% if notification.verb == 'commented' %}
 commented on your post:
 <a href="{{ url_for('main.post', id=notification.post_id, page=-1) }}">

@@ -653,3 +653,50 @@ img.person-avatar {
 .notification-menu li a {
     white-space: normal;
 }
+.notif-list {
+    padding: 0 var(--space-3);
+}
+.notif-row {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    padding: var(--space-3) 0;
+    border-top: 1px solid var(--color-border);
+}
+.notif-row:first-child {
+    border-top: none;
+}
+.notif-row.unread {
+    background: linear-gradient(90deg, var(--color-primary-light), transparent 65%);
+    margin: 0 calc(-1 * var(--space-3));
+    padding-left: var(--space-3);
+    padding-right: var(--space-3);
+    border-radius: var(--radius);
+}
+.notif-content {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 14px;
+}
+.notif-content img {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    vertical-align: middle;
+    margin-right: var(--space-1);
+}
+.notif-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: var(--color-primary);
+    margin-top: 7px;
+    flex: 0 0 auto;
+}
+.notif-empty {
+    padding: var(--space-4) 0;
+    text-align: center;
+    color: var(--color-text-muted);
+    font-size: 13.5px;
+}

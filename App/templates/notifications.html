@@ -4,18 +4,19 @@
 {% block title %}StaffRoom - Notifications{% endblock %}
 
 {% block page_content %}
-<div class="page-header">
+<div class="page-head">
     <h1>Notifications</h1>
 </div>
-<ul class="list-group">
+<div class="card notif-list">
     {% for notification in notifications %}
-    <li class="list-group-item{% if not notification.read %} list-group-item-info{% endif %}">
-        {{ macros.render_notification(notification) }}
-    </li>
+    <div class="notif-row{% if not notification.read %} unread{% endif %}">
+        <div class="notif-content">{{ macros.render_notification(notification) }}</div>
+        {% if not notification.read %}<span class="notif-dot"></span>{% endif %}
+    </div>
     {% else %}
-    <li class="list-group-item">No notifications yet.</li>
+    <div class="notif-empty">No notifications yet.</div>
     {% endfor %}
-</ul>
+</div>
 <div class="pagination">
     {{ macros.pagination_widget(pagination, endpoint) }}
 </div>
