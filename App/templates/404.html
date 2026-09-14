@@ -1,10 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}StaffRoom - page Not found{% endblock %}
-
+{% block title %}StaffRoom - Page Not Found{% endblock %}
 
 {% block page_content %}
-<div class="page-header">
-    <h1>Not Found</h1>
+<div class="state-page">
+    <div class="code">Error 404</div>
+    <div class="state-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    </div>
+    <h1>Page not found</h1>
+    <p>The page you're looking for doesn't exist, or may have been moved.</p>
+    <a class="btn btn-primary" href="{{ url_for('main.index') }}">Back to feed</a>
 </div>
 {% endblock %}

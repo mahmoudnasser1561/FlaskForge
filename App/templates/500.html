@@ -2,9 +2,14 @@
 
 {% block title %}StaffRoom - Internal Error{% endblock %}
 
-
 {% block page_content %}
-<div class="page-header">
-    <h1>Internal Error</h1>
+<div class="state-page">
+    <div class="code">Error 500</div>
+    <div class="state-icon state-icon-warn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+    </div>
+    <h1>Something went wrong</h1>
+    <p>An unexpected error occurred on our end. It's been logged &mdash; try again in a moment.</p>
+    <a class="btn btn-primary" href="{{ url_for('main.index') }}">Back to feed</a>
 </div>
 {% endblock %}
