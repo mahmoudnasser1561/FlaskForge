@@ -5,34 +5,65 @@
 {% block title %}StaffRoom{% endblock %}
 
 {% block page_content %}
-<div class="page-head">
-    <h1>Feed</h1>
-    <span class="feed-count">{{ pagination.total }} post{{ 's' if pagination.total != 1 else '' }}</span>
-</div>
-{% if current_user.can(Permission.WRITE) %}
-<div class="composer">
-    <div class="composer-row">
-        <img class="composer-avatar" src="{{ current_user.gravatar(size=36) }}">
-        <div class="composer-form">
-            {{ wtf.quick_form(form) }}
+<div class="feed-layout">
+<main>
+    <div class="page-head">
+        <h1>Feed</h1>
+        <span class="feed-count">{{ pagination.total }} post{{ 's' if pagination.total != 1 else '' }}</span>
+    </div>
+    {% if current_user.can(Permission.WRITE) %}
+    <div class="composer">
+        <div class="composer-row">
+            <img class="composer-avatar" src="{{ current_user.gravatar(size=36) }}">
+            <div class="composer-form">
+                {{ wtf.quick_form(form) }}
+            </div>
         </div>
     </div>
-</div>
-{% endif %}
-<div class="post-tabs">
-    <div class="segmented">
-        <a{% if not show_followed %} class="active"{% endif %} href="{{ url_for('.show_all') }}">All</a>
-        {% if current_user.is_authenticated %}
-        <a{% if show_followed %} class="active"{% endif %} href="{{ url_for('.show_followed') }}">Followed</a>
-        {% endif %}
+    {% endif %}
+    <div class="post-tabs">
+        <div class="segmented">
+            <a{% if not show_followed %} class="active"{% endif %} href="{{ url_for('.show_all') }}">All</a>
+            {% if current_user.is_authenticated %}
+            <a{% if show_followed %} class="active"{% endif %} href="{{ url_for('.show_followed') }}">Followed</a>
+            {% endif %}
+        </div>
+        {% include '_posts.html' %}
     </div>
-    {% include '_posts.html' %}
-</div>
-{% if pagination %}
-<div class="pagination">
-    {{ macros.pagination_widget(pagination, '.index') }}
-</div>
+    {% if pagination %}
+    <div class="pagination">
+        {{ macros.pagination_widget(pagination, '.index') }}
+    </div>
+    {% endif %}
+</main>
+{% if current_user.is_authenticated %}
+<aside class="feed-sidebar">
+    <div class="side-card">
+        <p class="side-title">You</p>
+        <div class="me-row">
+            <img class="me-avatar" src="{{ current_user.gravatar(size=40) }}">
+            <div>
+                <div class="me-name">{{ current_user.name or current_user.username }}</div>
+                <div class="me-username">@{{ current_user.username }}</div>
+            </div>
+        </div>
+        <div class="me-stats">
+            <a class="me-stat" href="{{ url_for('.user', username=current_user.username) }}"><b>{{ current_user.posts.count() }}</b><span>Posts</span></a>
+            <a class="me-stat" href="{{ url_for('.followed_by', username=current_user.username) }}"><b>{{ current_user.followed.count() - 1 }}</b><span>Following</span></a>
+            <a class="me-stat" href="{{ url_for('.followers', username=current_user.username) }}"><b>{{ current_user.followers.count() - 1 }}</b><span>Followers</span></a>
+        </div>
+    </div>
+    {% if recent_notifications %}
+    <div class="side-card">
+        <p class="side-title">Recent activity</p>
+        {% for n in recent_notifications %}
+        <div class="activity-item">{{ macros.render_notification(n) }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</aside>
 {% endif %}
+</div>
 {% endblock %}
 
 {% block scripts %}
