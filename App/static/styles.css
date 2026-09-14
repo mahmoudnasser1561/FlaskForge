@@ -1005,6 +1005,11 @@ img.person-avatar {
     flex-direction: column;
     overflow: hidden;
 }
+#chat-panel[hidden],
+#chat-unavailable[hidden],
+#chat-chatting[hidden] {
+    display: none;
+}
 .chat-panel-head {
     display: flex;
     align-items: center;
