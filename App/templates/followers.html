@@ -4,23 +4,21 @@
 {% block title %}StaffRoom - {{ title }} {{ user.username }}{% endblock %}
 
 {% block page_content %}
-<div class="page-header">
+<div class="page-head">
     <h1>{{ title }} {{ user.username }}</h1>
+    <span class="feed-count">{{ pagination.total }} {{ 'person' if pagination.total == 1 else 'people' }}</span>
 </div>
-<table class="table table-hover followers">
-    <thead><tr><th>User</th><th>Since</th></tr></thead>
+<div class="card person-list">
     {% for follow in follows %}
-    <tr>
-        <td>
-            <a href="{{ url_for('.user', username = follow.user.username) }}">
-                <img class="img-rounded" src="{{ follow.user.gravatar(size=32) }}">
-                {{ follow.user.username }}
-            </a>
-        </td>
-        <td>{{ moment(follow.timestamp).format('L') }}</td>
-    </tr>
+    <div class="person-row">
+        <img class="person-avatar" src="{{ follow.user.gravatar(size=36) }}">
+        <div>
+            <div class="person-name"><a href="{{ url_for('.user', username=follow.user.username) }}">{{ follow.user.username }}</a></div>
+            <div class="person-meta">Following since {{ moment(follow.timestamp).format('L') }}</div>
+        </div>
+    </div>
     {% endfor %}
-</table>
+</div>
 <div class="pagination">
     {{ macros.pagination_widget(pagination, endpoint, username = user.username) }}
 </div>
