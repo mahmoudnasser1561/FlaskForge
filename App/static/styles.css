@@ -345,6 +345,54 @@ a:hover, a:focus {
 }
 
 /* ==========================================================================
+   State pages (unconfirmed account, 404, 500)
+   ========================================================================== */
+.state-page {
+    min-height: calc(100vh - 260px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--space-6) var(--space-3);
+}
+.state-page .code {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--color-primary);
+    text-transform: uppercase;
+    margin-bottom: var(--space-2);
+}
+.state-page h1 {
+    font-size: 22px;
+    margin: 0 0 var(--space-2);
+}
+.state-page p {
+    color: var(--color-text-muted);
+    max-width: 42ch;
+    margin: 0 0 var(--space-4);
+}
+.state-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: var(--color-primary-light);
+    color: var(--color-primary);
+    display: grid;
+    place-items: center;
+    margin-bottom: var(--space-4);
+}
+.state-icon svg {
+    width: 26px;
+    height: 26px;
+}
+.state-icon-warn {
+    background-color: #FFFBEB;
+    color: var(--color-warning);
+}
+
+/* ==========================================================================
    Profile page
    ========================================================================== */
 .profile-card {

@@ -3,18 +3,12 @@
 {% block title %}StaffRoom - Confirm your account{% endblock %}
 
 {% block page_content %}
-<div class="page-header">
-    <h1>
-        Hello, {{ current_user.username }}!
-    </h1>
-    <h3>You have not confirmed your account yet.</h3>
-    <p>
-        Before you can access this site you need to confirm your account.
-        Check your inbox, you should have received an email with a confirmation link.
-    </p>
-    <p>
-        Need another confirmation email?
-        <a href="{{ url_for('auth.resend_confirmation') }}">Click here</a>
-    </p>
+<div class="state-page">
+    <div class="state-icon state-icon-warn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+    </div>
+    <h1>Confirm your email address</h1>
+    <p>We sent a confirmation link to <b>{{ current_user.email }}</b>. Click it to get full access to StaffRoom.</p>
+    <a class="btn btn-primary" href="{{ url_for('auth.resend_confirmation') }}">Resend confirmation email</a>
 </div>
 {% endblock %}

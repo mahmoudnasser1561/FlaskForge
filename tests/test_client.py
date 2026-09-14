@@ -1,4 +1,3 @@
-import re
 import unittest
 from App import create_app, db
 from App.models import User, Role
@@ -39,9 +38,8 @@ class FlaskClientTestCase(unittest.TestCase):
             'password': 'cat'
         }, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(re.search(b'Hello,\s+john!', response.data))
-        self.assertTrue(
-            b'You have not confirmed your account yet' in response.data)
+        self.assertTrue(b'Confirm your email address' in response.data)
+        self.assertTrue(b'john@example.com' in response.data)
 
         # send a confirmation token
         user = User.query.filter_by(email='john@example.com').first()
