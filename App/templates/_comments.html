@@ -7,6 +7,11 @@
                 <a class="comment-author" href="{{ url_for('.user', username=comment.author.username) }}">{{ comment.author.username }}</a>
                 <span class="comment-date">{{ moment(comment.timestamp).fromNow() }}</span>
             </div>
+            {% if moderate %}
+            <div class="mod-context">
+                on <a href="{{ url_for('.post', id=comment.post.id, page=-1) }}">&ldquo;{{ comment.post.body[:60] }}{% if comment.post.body|length > 60 %}&hellip;{% endif %}&rdquo;</a>
+            </div>
+            {% endif %}
             <div class="comment-body">
                 {% if comment.disabled %}
                 <p class="comment-disabled-note"><i>This comment has been disabled by a moderator.</i></p>
@@ -22,6 +27,7 @@
             {% if moderate %}
             <div class="comment-mod-actions">
                 {% if comment.disabled %}
+                <span class="chip chip-danger">Disabled</span>
                 <a class="post-action" href="{{ url_for('.moderate_enable', id=comment.id, page=page) }}">Enable</a>
                 {% else %}
                 <a class="post-action post-action-danger" href="{{ url_for('.moderate_disable', id=comment.id, page=page) }}">Disable</a>

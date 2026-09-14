@@ -358,6 +358,11 @@ a:hover, a:focus {
     color: var(--color-warning);
     vertical-align: middle;
 }
+.chip-danger {
+    background-color: #FEF2F2;
+    color: var(--color-danger);
+    vertical-align: middle;
+}
 
 /* ==========================================================================
    Feed page head, composer, view toggle
@@ -567,6 +572,14 @@ p.comment-disabled-note {
 }
 div.comment-mod-actions {
     margin-top: var(--space-1);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+div.mod-context {
+    font-size: 12.5px;
+    color: var(--color-text-muted);
+    margin-top: 1px;
 }
 div.flask-pagedown-preview {
     margin: var(--space-2) 0;

@@ -4,8 +4,9 @@
 {% block title %}StaffRoom - Comment Moderation{% endblock %}
 
 {% block page_content %}
-<div class="page-header">
+<div class="page-head">
     <h1>Comment Moderation</h1>
+    <span class="feed-count">{{ pagination.total }} comment{{ 's' if pagination.total != 1 else '' }}</span>
 </div>
 {% set moderate = True %}
 {% include '_comments.html' %}
