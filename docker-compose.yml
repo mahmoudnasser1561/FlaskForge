@@ -41,6 +41,8 @@ services:
       MODERATION_SERVICE_TOKEN: ${MODERATION_SERVICE_TOKEN:-}
       MODERATION_QUEUE_NAME: ${MODERATION_QUEUE_NAME:-moderation_queue}
       MODERATION_HEARTBEAT_KEY: ${MODERATION_HEARTBEAT_KEY:-moderation_agent:heartbeat}
+      CHATBOT_SERVICE_URL: http://chatbot-service:5001
+      CHATBOT_SERVICE_TOKEN: ${CHATBOT_SERVICE_TOKEN:-}
     healthcheck:
       test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health').read()"]
       interval: 10s
@@ -71,6 +73,18 @@ services:
         condition: service_started
       web:
         condition: service_healthy
+
+  chatbot-service:
+    build: ./chatbot_service
+    profiles: ["chatbot"]
+    environment:
+      CHATBOT_SERVICE_TOKEN: ${CHATBOT_SERVICE_TOKEN:-}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      CHATBOT_MODEL_ID: ${CHATBOT_MODEL_ID:-amazon.nova-micro-v1:0}
+    volumes:
+      - ./moderation_agent/policy.md:/app/policy.md:ro
 
 volumes:
   db_data:
